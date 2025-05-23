@@ -1,3 +1,3 @@
-import {Tables } from './supabase'
+import { Database } from "./supabase";
 
-export type  UserTable = Tables<"users">; 
+export type User = Database["public"]["Tables"]["users"]["Row"];

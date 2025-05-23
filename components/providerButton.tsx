@@ -1,13 +1,12 @@
 "use client";
 
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Provider } from "@supabase/supabase-js";
 import { Button } from "./ui/button";
 import { Google } from "./Icons";
+import { createClient } from "@/utils/supabase/client";
 
-const SUPABASE_REDIRECT = "http://localhost:3000/auth/callback";
-export default function SignInButton() {
-  const supabase = createClientComponentClient();
+export default function Providerbutton() {
+  const supabase = createClient();
 
   const signInWithProvider = async (provider: Provider) => {
     const { data, error } = await supabase.auth.signInWithOAuth({

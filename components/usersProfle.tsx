@@ -1,41 +1,19 @@
-"use client"
-import { UserTable } from "@/types/tables.type";
-import { supabase } from "@/utils/client";
-import { useEffect, useState } from "react";
+import { redirect } from "next/navigation";
 
-export const UsersProfile = () => {
-  const [usersData, setUsersData] = useState<UserTable[]>([]);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+import { createClient } from "@/utils/supabase/server";
 
-  const fetchData = async () => {
-    setIsLoading(true);
-    const { data, error } = await supabase.from('users').select('*');
-    if (data) setUsersData(data);
-    if (error) setErrorMsg(error.message);
-    setIsLoading(false);
-  };
+export default async function UsersProfile() {
+  const supabase = await createClient();
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data?.user) {
+    redirect("/login");
+  }
 
   return (
-    <div>
-      {errorMsg && <p className="text-red-500">Error: {errorMsg}</p>}
-      {isLoading ? (
-        <p>Loading...</p>
-      ) : usersData.length > 0 ? (
-        usersData.map((user) => (
-          <div key={user.id}>
-            <p>ID: {user.id}</p>
-            <p>Name: {user.username}</p>
-            <p>Email: {user.email}</p>
-          </div>
-        ))
-      ) : (
-        <p>No data available.</p>
-      )}
-    </div>
+    <>
+      <p>Hello {data.user.email}</p> <p> --- </p>{" "}
+      <p> {data.user.id || "no phone"}</p>
+    </>
   );
-};
+}
