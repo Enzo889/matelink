@@ -29,9 +29,13 @@ export default function Providerbutton({ signIn = true }: ProviderButtonProps) {
 
   return (
     <div className="flex items-center justify-center gap-1.5">
-      <p>{signIn ? "Log in" : "Sign in"} with</p>
-      <Button variant="outline" onClick={() => signInWithProvider("google")}>
-        <Google className="mr-2 h-4 w-4" /> Google
+      <p>{signIn ? "Log in" : "Sign up"} with</p>
+      <Button
+        variant="outline"
+        className="cursor-pointer"
+        onClick={() => signInWithProvider("google")}
+      >
+        <Google className="mr-2 h-4 w-4 " /> Google
       </Button>
     </div>
   );
