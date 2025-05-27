@@ -1,30 +1,25 @@
-import { buttonVariants } from "@/components/ui/button";
+import LoginForHomepage from "@/components/login-component";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import Link from "next/link";
+import Image from "next/image";
 
 export default function HomePage() {
   return (
     <main className="flex flex-col items-center justify-center min-h-screen p-4">
-      <Card className="w-full max-w-md shadow-lg">
+      <Card className="w-full max-w-6xl shadow-lg">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">
-            Welcome to Matelink
+          <CardTitle className="text-4xl font-bold text-center">
+            Welcome to MateLink
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-col items-center gap-4">
-          <p className="text-gray-600 text-center">
-            Connect, share, and grow your social network.
-          </p>
-          <Link
-            href="/login"
-            className={buttonVariants({
-              className: "w-full",
-              variant: "default",
-              size: "lg",
-            })}
-          >
-            Get Started
-          </Link>
+        <CardContent className="flex items-center gap-4 w-full border-2">
+          <Image
+            alt="logo"
+            src="108-logo-light.svg"
+            width={600}
+            height={600}
+            className=""
+          />
+          <LoginForHomepage />
         </CardContent>
       </Card>
     </main>
