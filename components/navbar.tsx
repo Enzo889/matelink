@@ -20,7 +20,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "./ui/button";
 import { Icons } from "./Icons";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import {
+  MorphingPopover,
+  MorphingPopoverContent,
+  MorphingPopoverTrigger,
+} from "./ui/morphing-popover";
+import { motion } from "motion/react";
+import { PostDialog } from "./post-component";
 
 function Navbar() {
   const pathname = usePathname();
@@ -75,14 +81,30 @@ function Navbar() {
           </Link>
         );
       })}
-      <Popover>
-        <PopoverTrigger asChild>
+      <MorphingPopover
+        variants={{
+          initial: { opacity: 0, filter: "blur(10px)" },
+          animate: { opacity: 1, filter: "blur(0px)" },
+          exit: { opacity: 0, filter: "blur(10px)" },
+        }}
+        transition={{
+          duration: 0.25,
+          ease: "backOut",
+        }}
+      >
+        <MorphingPopoverTrigger asChild>
           <Button className="flex bg-background text-muted-foreground font-semibold items-center justify-center gap-5  w-fit h-fit p-4  hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 cursor-pointer transition-colors duration-200 ease-in-out rounded-4xl text-[1rem] md:text-[1.25rem]  ">
-            <EllipsisIcon className="h-6 w-6 text-foreground transition-colors ml-2 " />{" "}
-            More Options
+            <motion.span
+              layoutId="morphing-popover-custom-transition-variants-label"
+              layout="position"
+              className="flex items-center justify-center gap-5 "
+            >
+              <EllipsisIcon className="h-6 w-6 text-foreground transition-colors ml-2 " />{" "}
+              More Options
+            </motion.span>
           </Button>
-        </PopoverTrigger>
-        <PopoverContent className="rounded-2xl shadow-2xl p-0 overflow-hidden">
+        </MorphingPopoverTrigger>
+        <MorphingPopoverContent className="rounded-2xl shadow-2xl p-0 overflow-hidden">
           <div className="flex flex-col gap-2 ">
             {popoverItems.map((item, index) => {
               const Icon = item.icon;
@@ -100,11 +122,9 @@ function Navbar() {
               );
             })}
           </div>
-        </PopoverContent>
-      </Popover>
-      <Button className="cursor-pointer text-xl md:text-2xl font-semibold rounded-4xl mt-1.5 py-6 px-28">
-        Post
-      </Button>
+        </MorphingPopoverContent>
+      </MorphingPopover>
+      <PostDialog />
     </div>
   );
 }
