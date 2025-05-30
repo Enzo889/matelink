@@ -104,7 +104,7 @@ function Navbar() {
             </motion.span>
           </Button>
         </MorphingPopoverTrigger>
-        <MorphingPopoverContent className="rounded-2xl shadow-2xl p-0 overflow-hidden">
+        <MorphingPopoverContent className="rounded-2xl shadow-2xl p-0 z-10">
           <div className="flex flex-col gap-2 ">
             {popoverItems.map((item, index) => {
               const Icon = item.icon;

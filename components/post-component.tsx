@@ -3,12 +3,8 @@ import { useRef, useState } from "react";
 import { Button } from "./ui/button";
 import {
   MorphingDialog,
-  MorphingDialogClose,
   MorphingDialogContainer,
   MorphingDialogContent,
-  MorphingDialogDescription,
-  MorphingDialogSubtitle,
-  MorphingDialogTitle,
   MorphingDialogTrigger,
 } from "./ui/morphing-dialog";
 import {
@@ -18,6 +14,8 @@ import {
   PromptInputTextarea,
 } from "./ui/prompt-input";
 import { ArrowUp, Paperclip, Square, X } from "lucide-react";
+import EmojiInput from "./emoji-input";
+import PostOptions from "./post-options";
 
 export const PostDialog = () => {
   return (
@@ -26,7 +24,7 @@ export const PostDialog = () => {
         <div
           className={` bg-primary text-primary-foreground shadow-xs hover:bg-primary/90" cursor-pointer text-xl md:text-2xl font-semibold rounded-4xl mt-1.5 py-3  px-24`}
         >
-          Post
+          New Post
         </div>
       </MorphingDialogTrigger>
       <MorphingDialogContainer>
@@ -34,7 +32,6 @@ export const PostDialog = () => {
           <div>
             <PostFeed />
           </div>
-          <MorphingDialogClose>Close</MorphingDialogClose>
         </MorphingDialogContent>
       </MorphingDialogContainer>
     </MorphingDialog>
@@ -78,7 +75,7 @@ export const PostFeed = () => {
       onValueChange={setInput}
       isLoading={isLoading}
       onSubmit={handleSubmit}
-      className="w-full min-w-xl h-full min-h-fit overflow-y-auto"
+      className="w-xl   h-full min-h-fit "
     >
       {files.length > 0 && (
         <div className="flex flex-wrap gap-2 pb-2">
@@ -100,41 +97,62 @@ export const PostFeed = () => {
         </div>
       )}
 
-      <PromptInputTextarea placeholder="Got something to share?" />
+      <PromptInputTextarea
+        placeholder="Got something to share?"
+        maxLength={300}
+        minLength={1}
+      />
 
-      <PromptInputActions className="flex items-center justify-between gap-2 pt-2">
-        <PromptInputAction tooltip="Attach files">
-          <label
-            htmlFor="file-upload"
-            className="hover:bg-secondary-foreground/10 flex h-8 w-8 cursor-pointer items-center justify-center rounded-2xl"
-          >
-            <input
-              type="file"
-              multiple
-              onChange={handleFileChange}
-              className="hidden"
-              id="file-upload"
-            />
-            <Paperclip className="text-primary size-5" />
-          </label>
-        </PromptInputAction>
+      <PromptInputActions className="flex-col items-start gap-2">
+        <div className=" resize-none border-none  focus-visible:ring-offset-0 border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 flex field-sizing-content  w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm">
+          <PromptInputAction tooltip="post visibility" side="left">
+            <PostOptions />
+          </PromptInputAction>
+        </div>
+        <div className="flex w-full items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <PromptInputAction tooltip="Attach files">
+              <label
+                htmlFor="file-upload"
+                className="hover:bg-secondary-foreground/10 flex h-8 w-8 cursor-pointer items-center justify-center rounded-2xl"
+              >
+                <input
+                  type="file"
+                  multiple
+                  onChange={handleFileChange}
+                  className="hidden"
+                  id="file-upload"
+                />
+                <Paperclip className="text-primary size-5" />
+              </label>
+            </PromptInputAction>
 
-        <PromptInputAction
-          tooltip={isLoading ? "Stop publication" : "Send post"}
-        >
-          <Button
-            variant="default"
-            size="icon"
-            className="h-8 w-8 rounded-full"
-            onClick={handleSubmit}
+            <PromptInputAction tooltip="Emojis">
+              <span>
+                <EmojiInput
+                  onEmojiClick={(emoji) => setInput((prev) => prev + emoji)}
+                />
+              </span>
+            </PromptInputAction>
+          </div>
+
+          <PromptInputAction
+            tooltip={isLoading ? "Stop publication" : "Send post"}
           >
-            {isLoading ? (
-              <Square className="size-5 fill-current" />
-            ) : (
-              <ArrowUp className="size-5" />
-            )}
-          </Button>
-        </PromptInputAction>
+            <Button
+              variant="default"
+              size="icon"
+              className="h-8 w-8 rounded-full"
+              onClick={handleSubmit}
+            >
+              {isLoading ? (
+                <Square className="size-5 fill-current" />
+              ) : (
+                <ArrowUp className="size-5" />
+              )}
+            </Button>
+          </PromptInputAction>
+        </div>
       </PromptInputActions>
     </PromptInput>
   );
