@@ -1,133 +1,132 @@
 import { useState } from "react";
 import { Check, GlobeIcon } from "lucide-react";
-import {
+import { Button } from "./ui/button";
+ import {
   Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "./ui/card";
-import { Button } from "./ui/button";
+} from "@/components/ui/card";
 import {
-  MorphingPopover,
-  MorphingPopoverContent,
-  MorphingPopoverTrigger,
-} from "./ui/morphing-popover";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Toggle } from "./ui/toggle";
 import { Switch } from "./ui/switch";
 
-function PostOptions() {
-  const [replies, setReplies] = useState("everybody");
+export default function PostOptions() {
+  const [replies, setReplies] = useState<"everybody" | "nobody">("everybody");
   const [mentioned, setMentioned] = useState(false);
   const [followed, setFollowed] = useState(false);
   const [followers, setFollowers] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
+
   return (
-    <MorphingPopover open={isOpen} onOpenChange={setIsOpen}>
-      <MorphingPopoverTrigger asChild>
-        <p
-          onClick={() => setIsOpen(true)}
-          className="text-primary text-xs bg-muted-foreground/10 px-2 py-1 rounded-full hover:bg-secondary-foreground/20 cursor-pointer flex items-center gap-1"
-        >
-          <GlobeIcon className="inline size-3" />
-          Anybody can interact
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger
+        asChild
+      >
+        <p  className="text-primary text-xs bg-muted-foreground/10 px-2 py-1 rounded-full hover:bg-secondary-foreground/20 cursor-pointer flex items-center gap-1">
+
+ <GlobeIcon className="inline size-3" />
+ Anybody can interact 
         </p>
-      </MorphingPopoverTrigger>
-      <MorphingPopoverContent className="z-50 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md  rounded-lg shadow-lg ">
-        <Card className="w-full  max-h-3/4">
-          <CardHeader>
-            <CardTitle>Post interaction settings</CardTitle>
-            <CardDescription>
+      </PopoverTrigger>
+      <PopoverContent className="w-screen z-50 fixed top-1/2 left-1/2  -translate-y-1/2 max-w-sm rounded-xl border bg-popover shadow-xl md:max-w-md max-h-dvw"  sideOffset={8}>
+        <Card className="overflow-hidden rounded-xl shadow-none border-0" onMouseDown={(e) => e.stopPropagation()}>
+          <CardHeader className="bg-muted/30 ">
+            <CardTitle className="text-lg font-semibold">Post Interaction Settings</CardTitle>
+            <CardDescription className="text-sm text-muted-foreground">
               Customize who can interact with this post.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div>
-              <div className="py-2 border-y-2 border-muted-foreground/20">
-                <p className="font-semibold">Quote settings</p>
-                <span className="flex items-center justify-between">
-                  <p>Allow quote posts</p>
-                  <Switch className="cursor-pointer" aria-readonly />
-                </span>
+          <CardContent >
+            <div className="space-y-1">
+              <div className="space-y-3 rounded-lg border border-border bg-card p-4">
+                <p className="font-medium text-card-foreground">Quote Settings</p>
+                <div className="flex items-center justify-between">
+                  <label htmlFor="allow-quote-posts" className="text-sm text-muted-foreground">
+                    Allow quote posts
+                  </label>
+                  <Switch id="allow-quote-posts" className="cursor-pointer" aria-readonly />
+                </div>
               </div>
-              <div className="pt-4">
-                <p className="font-semibold">Reply settings</p>
-                <p>Allow replies from:</p>
-                <span className="flex items-center justify-center gap-2">
+
+              <div className="space-y-3 rounded-lg border border-border bg-card p-4">
+                <p className="font-medium text-card-foreground">Reply Settings</p>
+                <p className="text-sm text-muted-foreground">Allow replies from:</p>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <Toggle
-                    className="cursor-pointer w-full justify-between"
+                    className="w-full justify-between rounded-md border border-input bg-transparent px-4 py-2 text-sm font-medium shadow-sm hover:bg-accent hover:text-accent-foreground data-[state=on]:bg-primary data-[state=on]:text-primary-foreground  cursor-pointer"
                     variant="outline"
                     pressed={replies === "everybody"}
                     onPressedChange={() => setReplies("everybody")}
                   >
-                    Everybody
-                    {replies === "everybody" && (
-                      <Check className="inline size-3" />
-                    )}
+                    <span>Everybody</span>
+                    {replies === "everybody" && <Check className="size-4" />}
                   </Toggle>
                   <Toggle
-                    className="cursor-pointer w-full justify-between"
+                    className="w-full justify-between rounded-md border border-input bg-transparent px-4 py-2 text-sm font-medium shadow-sm hover:bg-accent hover:text-accent-foreground data-[state=on]:bg-primary data-[state=on]:text-primary-foreground  cursor-pointer"
                     variant="outline"
                     pressed={replies === "nobody"}
                     onPressedChange={() => setReplies("nobody")}
                   >
-                    Nobody
-                    {replies === "nobody" && (
-                      <Check className="inline size-3" />
-                    )}
+                    <span>Nobody</span>
+                    {replies === "nobody" && <Check className="size-4" />}
                   </Toggle>
-                </span>
+                </div>
               </div>
+
               {replies === "everybody" && (
-                <div className="flex flex-col gap-1 py-4">
-                  <p>or combine these options:</p>
-                  <Toggle
-                    className="cursor-pointer w-full justify-between"
-                    variant="outline"
-                    pressed={mentioned}
-                    onPressedChange={(val) => setMentioned(val)}
-                  >
-                    Mentioned users
-                    {mentioned && <Check className="inline size-3" />}
-                  </Toggle>
-                  <Toggle
-                    className="cursor-pointer w-full justify-between"
-                    variant="outline"
-                    pressed={followed}
-                    onPressedChange={(val) => setFollowed(val)}
-                  >
-                    Users you follow
-                    {followed && <Check className="inline size-3" />}
-                  </Toggle>
-                  <Toggle
-                    className="cursor-pointer w-full justify-between"
-                    variant="outline"
-                    pressed={followers}
-                    onPressedChange={(val) => setFollowers(val)}
-                    // onClick={(e) => e.stopPropagation()}
-                    // onClickCapture={(e) => e.stopPropagation()}
-                  >
-                    Your followers
-                    {followers && <Check className="inline size-3" />}
-                  </Toggle>
+                <div className="space-y-3 rounded-lg border border-border bg-card p-4">
+                  <p className="text-sm font-medium text-muted-foreground">Or, refine who can reply:</p>
+                  <div className="space-y-2">
+                    <Toggle
+                      className="w-full justify-between rounded-md border border-input bg-transparent px-4 py-2 text-sm font-medium shadow-sm hover:bg-accent hover:text-accent-foreground data-[state=on]:bg-accent data-[state=on]:text-accent-foreground  cursor-pointer"
+                      variant="outline"
+                      pressed={mentioned}
+                      onPressedChange={(val) => setMentioned(val)}
+                    >
+                      <span>Mentioned users</span>
+                      {mentioned && <Check className="size-4" />}
+                    </Toggle>
+                    <Toggle
+                      className="w-full justify-between rounded-md border border-input bg-transparent px-4 py-2  cursor-pointer text-sm font-medium shadow-sm hover:bg-accent hover:text-accent-foreground data-[state=on]:bg-accent data-[state=on]:text-accent-foreground"
+                      variant="outline"
+                      pressed={followed}
+                      onPressedChange={(val) => setFollowed(val)}
+                    >
+                      <span>Users you follow</span>
+                      {followed && <Check className="size-4" />}
+                    </Toggle>
+                    <Toggle
+                      className="w-full justify-between rounded-md border border-input bg-transparent px-4 py-2 text-sm font-medium shadow-sm hover:bg-accent hover:text-accent-foreground data-[state=on]:bg-accent data-[state=on]:text-accent-foreground  cursor-pointer"
+                      variant="outline"
+                      pressed={followers}
+                      onPressedChange={(val) => setFollowers(val)}
+                    >
+                      <span>Your followers</span>
+                      {followers && <Check className="size-4" />}
+                    </Toggle>
+                  </div>
                 </div>
               )}
             </div>
           </CardContent>
-          <CardFooter className="flex justify-center items-center w-full">
+          <CardFooter className="border-t border-border bg-muted/30 p-2 md:p-4">
             <Button
               onClick={() => setIsOpen(false)}
-              className="w-full cursor-pointer"
+              className="w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 cursor-pointer"
             >
-              Save
+              Save Settings
             </Button>
           </CardFooter>
         </Card>
-      </MorphingPopoverContent>
-    </MorphingPopover>
+      </PopoverContent>
+    </Popover>
   );
 }
-
-export default PostOptions;
