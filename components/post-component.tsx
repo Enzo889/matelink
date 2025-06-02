@@ -16,6 +16,7 @@ import {
 import { ArrowUp, Paperclip, Square, X } from "lucide-react";
 import EmojiInput from "./emoji-input";
 import PostOptions from "./post-options";
+import NumberFlow from "@number-flow/react";
 
 export const PostDialog = () => {
   return (
@@ -99,7 +100,6 @@ export const PostFeed = () => {
 
       <PromptInputTextarea
         placeholder="Got something to share?"
-        maxLength={300}
         minLength={1}
       />
 
@@ -136,22 +136,33 @@ export const PostFeed = () => {
             </PromptInputAction>
           </div>
 
-          <PromptInputAction
-            tooltip={isLoading ? "Stop publication" : "Send post"}
-          >
-            <Button
-              variant="default"
-              size="icon"
-              className="h-8 w-8 rounded-full"
-              onClick={handleSubmit}
+          <div className="flex items-center gap-2">
+            <PromptInputAction tooltip="Character count">
+              <span
+                className={`text-xs text-foreground p-2 rounded-4xl  ${
+                  input.length > 300 ? "bg-destructive" : "bg-secondary"
+                } `}
+              >
+                <NumberFlow value={300 - input.length} />
+              </span>
+            </PromptInputAction>
+            <PromptInputAction
+              tooltip={isLoading ? "Stop publication" : "Send post"}
             >
-              {isLoading ? (
-                <Square className="size-5 fill-current" />
-              ) : (
-                <ArrowUp className="size-5" />
-              )}
-            </Button>
-          </PromptInputAction>
+              <Button
+                variant="default"
+                size="icon"
+                className="h-8 w-8 rounded-full"
+                onClick={handleSubmit}
+              >
+                {isLoading ? (
+                  <Square className="size-5 fill-current" />
+                ) : (
+                  <ArrowUp className="size-5" />
+                )}
+              </Button>
+            </PromptInputAction>
+          </div>
         </div>
       </PromptInputActions>
     </PromptInput>
