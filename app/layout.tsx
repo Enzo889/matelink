@@ -57,8 +57,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <div className="flex">  
           <Navbar />
           {children}
+          </div>
         </ThemeProvider>
       </body>
     </html>
