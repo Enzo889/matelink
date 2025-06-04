@@ -23,13 +23,13 @@ import {
 } from "lucide-react";
 
 import { Button } from "./ui/button";
-import { Icons } from "./Icons";
 import {
   MorphingPopover,
   MorphingPopoverContent,
   MorphingPopoverTrigger,
 } from "./ui/morphing-popover";
 import { PostDialog } from "./post-component";
+import { ModeToggle } from "./mode-toggle";
 
 const navItems = [
   { label: "Home", href: "/", icon: HomeIcon },
@@ -59,6 +59,9 @@ export default function Navbar() {
 
   return (
     <div className="flex flex-col items-start justify-start ml-4 my-4 w-fit h-fit">
+      <span className="mb-4 ml-3">
+        <ModeToggle />
+      </span>
       {navItems.map(({ label, href, icon: Icon }, index) => {
         const isActive = pathname === href;
 
@@ -72,14 +75,23 @@ export default function Navbar() {
             )}
           >
             <div className="flex items-center gap-5">
-              <Icon className="h-6 w-6 text-muted-foreground" />
-              <span className="text-[1rem] md:text-[1.25rem] font-semibold text-muted-foreground">
+              <Icon
+                className={`h-6 w-6 text-muted-foreground ${
+                  isActive ? "text-primary" : "text-muted-foreground"
+                } `}
+              />
+              <span
+                className={`text-[1rem] md:text-[1.25rem] font-semibold 
+                ${
+                  isActive
+                    ? "text-primary border-dashed  border-b-2 border-primary"
+                    : "text-muted-foreground"
+                }
+`}
+              >
                 {label}
               </span>
             </div>
-            {isActive && (
-              <Icons.underline className="hidden sm:block pointer-events-none absolute inset-x-0 -bottom-3.5 text-blue-950/80" />
-            )}
           </Link>
         );
       })}
@@ -93,7 +105,7 @@ export default function Navbar() {
         transition={{ duration: 0.25, ease: "backOut" }}
       >
         <MorphingPopoverTrigger asChild>
-          <Button className="flex cursor-pointer items-center mt-1 gap-5 w-fit h-fit py-3 px-4 rounded-4xl transition-colors duration-200 ease-in-out hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 text-[1rem] md:text-[1.25rem] font-semibold text-muted-foreground bg-background transition-colors duration-200 ease-in-out hover:bg-accent hover:text-accent-foreground">
+          <Button className="flex cursor-pointer items-center mt-1 gap-5 w-fit h-fit py-3 px-4 rounded-4xl transition-colors duration-200 ease-in-out hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 text-[1rem] md:text-[1.25rem] font-semibold text-muted-foreground bg-background">
             <motion.span
               layoutId="morphing-popover-custom-transition-variants-label"
               layout="position"
