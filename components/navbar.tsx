@@ -30,6 +30,7 @@ import {
 } from "./ui/morphing-popover";
 import { PostDialog } from "./post-component";
 import { ModeToggle } from "./mode-toggle";
+import ProfileOptions from "./profile-options";
 
 const navItems = [
   { label: "Home", href: "/", icon: HomeIcon },
@@ -59,8 +60,9 @@ export default function Navbar() {
 
   return (
     <div className="flex flex-col items-start justify-start ml-4 my-4 w-fit h-fit">
-      <span className="mb-4 ml-3">
+      <span className="mb-4 ml-3 flex gap-4">
         <ModeToggle />
+        <ProfileOptions />
       </span>
       {navItems.map(({ label, href, icon: Icon }, index) => {
         const isActive = pathname === href;
@@ -84,7 +86,7 @@ export default function Navbar() {
                 className={`text-[1rem] md:text-[1.25rem] font-semibold 
                 ${
                   isActive
-                    ? "text-primary border-dashed  border-b-2 border-primary"
+                    ? "text-primary underline  decoration-wavy"
                     : "text-muted-foreground"
                 }
 `}

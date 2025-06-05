@@ -43,7 +43,7 @@ export default async function UsersProfile() {
 
   return (
     <div className="container mx-auto p-4">
-      <div className="bg-white shadow-md rounded-lg p-6">
+      <div className="bg-card shadow-md rounded-lg p-6">
         <div className="flex items-center space-x-4 mb-6">
           <Image
             src={avatarSrc}
@@ -55,14 +55,14 @@ export default async function UsersProfile() {
           />
           <div>
             <h1 className="text-2xl font-bold">{userProfile.name} {userProfile.surname}</h1>
-            <p className="text-gray-600">@{userProfile.username}</p>
+            <p className="text-secondary-foreground ">@{userProfile.username}</p>
             {userProfile.is_company && <span className="text-sm bg-blue-100 text-blue-700 px-2 py-1 rounded-full">Company</span>}
           </div>
         </div>
 
         <div className="mb-4">
           <h2 className="text-xl font-semibold mb-2">About</h2>
-          <p className="text-gray-700 whitespace-pre-wrap">
+          <p className="text-secondary-foreground whitespace-pre-wrap">
             {userProfile.description || "No description provided."}
           </p>
         </div>
@@ -70,7 +70,7 @@ export default async function UsersProfile() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <h3 className="font-semibold">Email:</h3>
-            <p className="text-gray-700">{userProfile.email}</p>
+            <p className="text-secondary-foreground ">{userProfile.email}</p>
           </div>
           {userProfile.website && (
             <div>
@@ -83,13 +83,13 @@ export default async function UsersProfile() {
           {userProfile.residence && (
              <div>
                <h3 className="font-semibold">Residence:</h3>
-               <p className="text-gray-700">{userProfile.residence}</p>
+               <p className="text-secondary-foreground ">{userProfile.residence}</p>
              </div>
           )}
           {userProfile.birthday && (
             <div>
               <h3 className="font-semibold">Birthday:</h3>
-              <p className="text-gray-700">{new Date(userProfile.birthday).toLocaleDateString()}</p>
+              <p className="text-secondary-foreground ">{new Date(userProfile.birthday).toLocaleDateString()}</p>
             </div>
           )}
         </div>
