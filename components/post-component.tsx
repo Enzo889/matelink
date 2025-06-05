@@ -23,7 +23,7 @@ export const PostDialog = () => {
     <MorphingDialog>
       <MorphingDialogTrigger>
         <div
-          className={` bg-primary text-primary-foreground shadow-xs hover:bg-primary/90" cursor-pointer text-xl md:text-2xl font-semibold rounded-4xl mt-1.5 py-3  px-24`}
+          className={` bg-primary text-primary-foreground shadow-xs hover:bg-primary/90" cursor-pointer text-xl md:text-2xl font-semibold rounded-4xl mt-1.5 py-3  px-16`}
         >
           New Post
         </div>

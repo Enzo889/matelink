@@ -59,7 +59,7 @@ export default function Navbar() {
   if (!showNav) return null;
 
   return (
-    <div className="flex flex-col items-start justify-start ml-4 my-4 w-fit h-fit">
+    <div className="flex flex-col items-start justify-start mx-auto my-4 w-fit h-fit">
       <span className="mb-4 ml-3 flex gap-4">
         <ModeToggle />
         <ProfileOptions />
@@ -86,7 +86,7 @@ export default function Navbar() {
                 className={`text-[1rem] md:text-[1.25rem] font-semibold 
                 ${
                   isActive
-                    ? "text-primary underline  decoration-wavy"
+                    ? "text-primary border-dashed  border-b-2 border-primary"
                     : "text-muted-foreground"
                 }
 `}

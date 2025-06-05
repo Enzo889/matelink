@@ -16,7 +16,7 @@ export function ModeToggle() {
       variant="outline"
       size="icon"
       onClick={toggleTheme}
-      className="relative"
+      className="relative cursor-pointer"
       aria-label="Toggle theme"
       title="Toggle theme"
     >
