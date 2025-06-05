@@ -1326,6 +1326,7 @@ export type Database = {
           description: string | null
           email: string
           id: number
+          uuid: string
           is_active: boolean | null
           is_company: boolean | null
           name: string
