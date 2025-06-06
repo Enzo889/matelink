@@ -119,7 +119,7 @@ export default function Navbar() {
           </Button>
         </MorphingPopoverTrigger>
 
-        <MorphingPopoverContent className="rounded-2xl shadow-2xl p-0 z-10">
+        <MorphingPopoverContent className="rounded-2xl shadow-2xl p-0 z-10 absolute bottom-0 ">
           <div className="flex flex-col gap-2">
             {popoverItems.map(({ label, href, icon: Icon }, index) => (
               <Link
