@@ -58,9 +58,16 @@ export default async function UsersProfile() {
 
   return (
     <div className="w-full">
+       <div className="sticky z-10  top-0  flex justify-between bg-background w-full pt-4 px-2 ">
+
+<BackButton /> {/* Moved BackButton here for better UX */}
+<Button className="rounded-full bg-foreground text-background hover:bg-foreground/90 ">
+  Follow
+</Button>
+</div>
       {/* Header/Cover Image */}
       <div className="relative">
-        <div className="h-48 sm:h-64 bg-gradient-to-r from-blue-400 to-purple-500 relative overflow-hidden">
+        <div className="h-36 sm:h-44 bg-gradient-to-r from-blue-400 to-purple-500 relative overflow-hidden">
           <Image 
             src={coverPhotoSrc} 
             alt={`${displayName}'s cover photo`} 
@@ -81,12 +88,7 @@ export default async function UsersProfile() {
         </div>
 
         {/* Action Buttons on Cover */}
-        <div className="absolute top-0  flex justify-between bg-background w-full pt-4 px-2 ">
-          <BackButton /> {/* Moved BackButton here for better UX */}
-          <Button className="rounded-full bg-foreground text-background hover:bg-foreground/90 ">
-            Follow
-          </Button>
-        </div>
+       
       </div>
 
       {/* Profile Info */}

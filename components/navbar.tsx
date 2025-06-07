@@ -87,7 +87,7 @@ export default function Navbar() {
                 ${
                   isActive
                     ? "text-primary border-dashed  border-b-2 border-primary"
-                    : "text-muted-foreground"
+                    : "text-muted-foreground border-b-2 border-transparent"
                 }
 `}
               >

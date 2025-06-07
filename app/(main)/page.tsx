@@ -1,10 +1,9 @@
-import UsersProfile from "@/components/usersProfle";
 
 export default function Home() {
   return (
     <>
       <div className="flex justify-center items-center">
-        <UsersProfile />
+        <p>home</p>
       </div>
     </>
   );
