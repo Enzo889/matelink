@@ -3,10 +3,10 @@ import Image from "next/image";
 import { createClient } from "@/utils/supabase/server";
 import { UserType } from "@/types/tables.type";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, LinkIcon, MapPin,  Edit } from "lucide-react";
 import BackButton from "./back-button"; 
+import { AvatarComponent } from "@/app/(main)/components/avatar";
 
 export default async function UsersProfile() {
   const supabase = await createClient();
@@ -46,8 +46,6 @@ export default async function UsersProfile() {
     );
   }
 
-  const profileAvatarSrc =
-    userProfile.profile_picture || "/default-avatar.png";
   const coverPhotoSrc = 
     userProfile.cover_photo || "/cover-default-photo.jpeg";
   
@@ -78,15 +76,7 @@ export default async function UsersProfile() {
         </div>
 
         {/* Profile Picture */}
-        <div className="absolute -bottom-16 left-4">
-          <Avatar className="w-32 h-32 border-4 border-background">
-            <AvatarImage src={profileAvatarSrc} alt={`${displayName}'s profile picture`} />
-            <AvatarFallback className="text-2xl">
-              {displayName.substring(0, 2).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-        </div>
-
+        <AvatarComponent />
         {/* Action Buttons on Cover */}
        
       </div>

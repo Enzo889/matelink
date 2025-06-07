@@ -17,7 +17,11 @@ import {
 import { Toggle } from "./ui/toggle";
 import { Switch } from "./ui/switch";
 
-export default function PostOptions() {
+interface Props {
+  offsetNumber?: number;
+}
+
+export default function PostOptions({offsetNumber = 8}: Props) {
   const [replies, setReplies] = useState<"everybody" | "nobody">("everybody");
   const [mentioned, setMentioned] = useState(false);
   const [followed, setFollowed] = useState(false);
@@ -33,8 +37,8 @@ export default function PostOptions() {
         </p>
       </PopoverTrigger>
       <PopoverContent
-        className="w-screen z-50 fixed top-1/2 left-1/2  -translate-y-1/2 max-w-sm rounded-xl border bg-popover shadow-xl md:max-w-md   max-h-[90vh] overflow-y-auto"
-        sideOffset={8}
+        className="w-screen z-50 fixed top-1/2 left-1/2  -translate-y-1/2  max-w-sm rounded-xl border bg-popover shadow-xl md:max-w-md   max-h-[90vh] overflow-y-auto"
+        sideOffset={offsetNumber}
         onMouseDown={(e) => e.stopPropagation()}
       >
         <Card className="overflow-hidden rounded-xl shadow-none border-0">

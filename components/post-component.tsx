@@ -17,6 +17,7 @@ import { ArrowUp, Paperclip, Square, X } from "lucide-react";
 import EmojiInput from "./emoji-input";
 import PostOptions from "./post-options";
 import NumberFlow from "@number-flow/react";
+import { AvatarComponent } from "@/app/(main)/components/avatar";
 
 export const PostDialog = () => {
   return (
@@ -39,7 +40,7 @@ export const PostDialog = () => {
   );
 };
 
-export const PostFeed = () => {
+export const  PostFeed = ({offsetNumber = 8 }) => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
@@ -69,6 +70,8 @@ export const PostFeed = () => {
       uploadInputRef.current.value = "";
     }
   };
+  
+  
 
   return (
     <PromptInput
@@ -106,11 +109,17 @@ export const PostFeed = () => {
       <PromptInputActions className="flex-col items-start gap-2">
         <div className=" resize-none border-none  focus-visible:ring-offset-0 border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 flex field-sizing-content  w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm">
           <PromptInputAction tooltip="post visibility" side="left">
-            <PostOptions />
+            <PostOptions  offsetNumber={offsetNumber } />
           </PromptInputAction>
         </div>
         <div className="flex w-full items-center justify-between gap-2">
           <div className="flex items-center gap-2">
+            <PromptInputAction tooltip="avatar">
+              <AvatarComponent 
+                className="w-8 h-8" 
+                containerClassName="relative"
+              />
+            </PromptInputAction>
             <PromptInputAction tooltip="Attach files">
               <label
                 htmlFor="file-upload"
