@@ -81,7 +81,7 @@ export default async function UsersProfile() {
         </div>
 
         {/* Action Buttons on Cover */}
-        <div className="absolute top-0 flex justify-between bg-background w-full pt-4 px-2 ">
+        <div className="absolute top-0  flex justify-between bg-background w-full pt-4 px-2 ">
           <BackButton /> {/* Moved BackButton here for better UX */}
           <Button className="rounded-full bg-foreground text-background hover:bg-foreground/90 ">
             Follow
@@ -172,12 +172,12 @@ export default async function UsersProfile() {
       {/* Navigation Tabs */}
       <div className="border-b border-border">
         <nav className="flex overflow-x-auto">
-          {["Posts", "Replies", "Highlights", "Media", "Likes"].map((tab) => (
+          {["Posts", "Replies", "Sales", "Media", "Likes"].map((tab) => (
             <button 
               key={tab}
-              className={`flex-1 min-w-[80px] py-3 px-2 text-center text-sm font-medium ${ 
+              className={`flex-1 min-w-[80px] py-3 px-2 text-center   text-sm font-medium ${ 
                 tab === "Posts" 
-                  ? "text-foreground border-b-2 border-blue-500"
+                  ? "text-foreground border-b-2 border-accent"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
               } transition-colors duration-150 ease-in-out`}
             >
