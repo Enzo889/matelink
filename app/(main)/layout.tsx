@@ -10,11 +10,8 @@ export default function Layout({ children }: { children: ReactNode }) {
         <Navbar />
       </nav>
 
-
       <main className="w-[45%] h-full  border-x-2  ">
-<ScrollContainer>
-        {children}
-</ScrollContainer>
+        <ScrollContainer>{children}</ScrollContainer>
       </main>
 
       <aside className="w-[30%] h-full px-4 py-6  ">

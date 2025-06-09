@@ -4,8 +4,8 @@ import { createClient } from "@/utils/supabase/server";
 import { UserType } from "@/types/tables.type";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, LinkIcon, MapPin,  Edit } from "lucide-react";
-import BackButton from "./back-button"; 
+import { Calendar, LinkIcon, MapPin, Edit } from "lucide-react";
+import BackButton from "./back-button";
 import { AvatarComponent } from "@/app/(main)/components/avatar";
 
 export default async function UsersProfile() {
@@ -40,37 +40,47 @@ export default async function UsersProfile() {
     return (
       <div className="container mx-auto p-4 text-center">
         <p className="text-xl text-red-500">User profile not found.</p>
-        <p>There might be an issue fetching the profile data or the profile does not exist.</p>
+        <p>
+          There might be an issue fetching the profile data or the profile does
+          not exist.
+        </p>
         <BackButton />
       </div>
     );
   }
 
-  const coverPhotoSrc = 
-    userProfile.cover_photo || "/cover-default-photo.jpeg";
-  
+  const coverPhotoSrc = userProfile.cover_photo || "/cover-default-photo.jpeg";
+
   // Fallback for name if it's not split correctly or parts are missing
-  const displayName = userProfile.name ? userProfile.name : userProfile.username || "User";
-  const displayUsername = userProfile.username ? `@${userProfile.username.replaceAll(" ", "").toLowerCase()}` : "@username";
-  const joinedDate = userProfile.created_at ? new Date(userProfile.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : "Not available";
+  const displayName = userProfile.name
+    ? userProfile.name
+    : userProfile.username || "User";
+  const displayUsername = userProfile.username
+    ? `@${userProfile.username.replaceAll(" ", "").toLowerCase()}`
+    : "@username";
+  const joinedDate = userProfile.created_at
+    ? new Date(userProfile.created_at).toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric",
+      })
+    : "Not available";
 
   return (
     <div className="w-full">
-       <div className="sticky z-10  top-0  flex justify-between bg-background w-full pt-4 px-2 ">
-
-<BackButton /> {/* Moved BackButton here for better UX */}
-<Button className="rounded-full bg-foreground text-background hover:bg-foreground/90 ">
-  Follow
-</Button>
-</div>
+      <div className="sticky z-10  top-0  flex justify-between bg-background w-full pt-4 px-2 ">
+        <BackButton /> {/* Moved BackButton here for better UX */}
+        <Button className="rounded-full bg-foreground text-background hover:bg-foreground/90 ">
+          Follow
+        </Button>
+      </div>
       {/* Header/Cover Image */}
       <div className="relative">
         <div className="h-36 sm:h-44 bg-gradient-to-r from-blue-400 to-purple-500 relative overflow-hidden">
-          <Image 
-            src={coverPhotoSrc} 
-            alt={`${displayName}'s cover photo`} 
-            fill 
-            className="object-cover" 
+          <Image
+            src={coverPhotoSrc}
+            alt={`${displayName}'s cover photo`}
+            fill
+            className="object-cover"
             priority
           />
         </div>
@@ -78,7 +88,6 @@ export default async function UsersProfile() {
         {/* Profile Picture */}
         <AvatarComponent />
         {/* Action Buttons on Cover */}
-       
       </div>
 
       {/* Profile Info */}
@@ -91,7 +100,7 @@ export default async function UsersProfile() {
           <Button className="rounded-full bg-foreground text-background hover:bg-foreground/90">
             Follow
           </Button>
-           <Button variant="outline" className="rounded-full">
+          <Button variant="outline" className="rounded-full">
             <Edit className="mr-2 h-4 w-4" /> Edit Profile
           </Button>
         </div>
@@ -101,7 +110,10 @@ export default async function UsersProfile() {
           <div className="flex items-center gap-1 mb-1">
             <h1 className="text-xl font-bold text-foreground">{displayName}</h1>
             {userProfile.is_company && (
-              <Badge variant="secondary" className="bg-blue-500 text-white text-xs px-1.5 py-0.5">
+              <Badge
+                variant="secondary"
+                className="bg-blue-500 text-white text-xs px-1.5 py-0.5"
+              >
                 Company
               </Badge>
             )}
@@ -131,8 +143,13 @@ export default async function UsersProfile() {
           {userProfile.website && (
             <div className="flex items-center gap-1">
               <LinkIcon className="h-4 w-4" />
-              <a href={userProfile.website} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
-                {userProfile.website.replace(/^https?:\/\//, '')}
+              <a
+                href={userProfile.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:underline"
+              >
+                {userProfile.website.replace(/^https?:\/\//, "")}
               </a>
             </div>
           )}
@@ -140,10 +157,13 @@ export default async function UsersProfile() {
             <Calendar className="h-4 w-4" />
             <span>Joined {joinedDate}</span>
           </div>
-           {userProfile.birthday && (
+          {userProfile.birthday && (
             <div className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" /> {/* Consider a different icon for birthday */}
-              <span>Born {new Date(userProfile.birthday).toLocaleDateString()}</span>
+              <Calendar className="h-4 w-4" />{" "}
+              {/* Consider a different icon for birthday */}
+              <span>
+                Born {new Date(userProfile.birthday).toLocaleDateString()}
+              </span>
             </div>
           )}
         </div>
@@ -152,11 +172,15 @@ export default async function UsersProfile() {
         <div className="flex gap-4 text-sm mb-4">
           <div className="flex items-center gap-1">
             <span className="font-bold text-foreground">1,234</span>
-            <span className="text-muted-foreground hover:underline cursor-pointer">Following</span>
+            <span className="text-muted-foreground hover:underline cursor-pointer">
+              Following
+            </span>
           </div>
           <div className="flex items-center gap-1">
             <span className="font-bold text-foreground">5,678</span>
-            <span className="text-muted-foreground hover:underline cursor-pointer">Followers</span>
+            <span className="text-muted-foreground hover:underline cursor-pointer">
+              Followers
+            </span>
           </div>
         </div>
       </div>
@@ -165,10 +189,10 @@ export default async function UsersProfile() {
       <div className="border-b border-border">
         <nav className="flex overflow-x-auto">
           {["Posts", "Replies", "Sales", "Media", "Likes"].map((tab) => (
-            <button 
+            <button
               key={tab}
-              className={`flex-1 min-w-[80px] py-3 px-2 text-center   text-sm font-medium ${ 
-                tab === "Posts" 
+              className={`flex-1 min-w-[80px] py-3 px-2 text-center   text-sm font-medium ${
+                tab === "Posts"
                   ? "text-foreground border-b-2 border-accent"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
               } transition-colors duration-150 ease-in-out`}

@@ -1,6 +1,6 @@
 "use client";
 
-import {  useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { flushSync } from "react-dom";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
