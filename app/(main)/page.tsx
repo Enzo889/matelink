@@ -1,5 +1,5 @@
 import { PostFeed } from "@/components/post-component";
-import PostCard from "./components/post-card";
+import Post from "./components/post";
 
 export default function Home() {
   return (
@@ -8,7 +8,9 @@ export default function Home() {
         <span className="mt-3">
           <PostFeed offsetNumber={200} />
         </span>
-        <PostCard />
+        <span className="w-full max-w-3xl">
+          <Post />
+        </span>
       </div>
     </>
   );

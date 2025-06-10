@@ -173,7 +173,7 @@ export default function Activity({
   );
 }
 
-export function ActivityWrapper() {
+export function ActivityWrapper({ className }: { className?: string }) {
   const [likes, setLikes] = useState(1200);
   const [liked, setLiked] = useState(false);
 
@@ -222,6 +222,7 @@ export function ActivityWrapper() {
       comments={comments}
       commented={commented}
       onComment={handleComment}
+      className={className}
     />
   );
 }
