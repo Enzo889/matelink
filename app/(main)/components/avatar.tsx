@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserType } from "@/types/tables.type";
 import { createClient } from "@/utils/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const AvatarComponent = ({
   className = "w-32 h-32 border-4 border-background",
@@ -62,9 +63,9 @@ export const AvatarComponent = ({
   if (isLoading) {
     return (
       <div className={containerClassName}>
-        <Avatar className={className}>
-          <AvatarFallback>...</AvatarFallback>
-        </Avatar>
+        <div className="flex items-center space-x-2">
+          <Skeleton className="h-8 w-8 rounded-full" />
+        </div>
       </div>
     );
   }
