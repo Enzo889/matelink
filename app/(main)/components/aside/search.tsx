@@ -1,8 +1,8 @@
 import React from "react";
-import { Input } from "./ui/input";
+import { Input } from "@/components/ui/input";
 import { SearchIcon } from "lucide-react";
 
-function AsideComponent() {
+function AsideSearchComponent() {
   return (
     <div className="relative">
       <Input
@@ -24,4 +24,4 @@ function AsideComponent() {
   );
 }
 
-export default AsideComponent;
+export default AsideSearchComponent;
