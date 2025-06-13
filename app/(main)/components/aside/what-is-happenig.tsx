@@ -4,9 +4,9 @@ import React from "react";
 
 function WhatHappenig() {
   return (
-    <div className="flex flex-col items-start gap-4  p-6 bg-background border rounded-lg text-start text-pretty">
+    <div className="flex flex-col items-start gap-4 p-6  bg-background border rounded-lg text-start text-pretty">
       <p className="font-semibold text-2xl">What is Happening</p>
-      {whatHappenigComponents()}
+      <span className="w-full">{whatHappenigComponents()}</span>
       <Button variant={"link"} asChild className="p-0">
         <Link href={"#"}>Show more </Link>
       </Button>
@@ -34,11 +34,15 @@ const whatHappenigComponents = () => {
   return (
     <>
       {data.map((item, index) => (
-        <div key={index}>
+        <Link
+          href="#"
+          key={index}
+          className="block hover:bg-foreground/5 p-2 rounded-md w-full transition-colors"
+        >
           <p className="text-xs text-foreground/50">Trend in {item.location}</p>
           <p>{item.topic}</p>
           <p className="text-xs text-foreground/50">{item.posts}</p>
-        </div>
+        </Link>
       ))}
     </>
   );

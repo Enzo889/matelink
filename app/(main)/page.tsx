@@ -1,5 +1,6 @@
 import { PostFeed } from "@/components/post-component";
 import Post from "./components/post";
+import TopButtonComp from "./components/top-button";
 
 export default function Home() {
   return (
@@ -11,6 +12,7 @@ export default function Home() {
         <span className="w-full max-w-3xl">
           <Post />
         </span>
+        <TopButtonComp />
       </div>
     </>
   );

@@ -3,6 +3,7 @@ import AsideSearchComponent from "./search";
 import PremiumAD from "./premium";
 import WhatHappenig from "./what-is-happenig";
 import OffersComponent from "./Offers";
+import JobsAside from "./jobs";
 
 function AsideComponent() {
   return (
@@ -11,6 +12,7 @@ function AsideComponent() {
       <PremiumAD />
       <WhatHappenig />
       <OffersComponent />
+      <JobsAside />
     </div>
   );
 }
