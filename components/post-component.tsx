@@ -77,7 +77,7 @@ export const PostFeed = ({ offsetNumber = 8 }) => {
       onValueChange={setInput}
       isLoading={isLoading}
       onSubmit={handleSubmit}
-      className="w-xl   h-full min-h-fit "
+      className="w-xl   h-full min-h-fit  max-md:w-xs"
     >
       {files.length > 0 && (
         <div className="flex flex-wrap gap-2 pb-2">

@@ -19,7 +19,7 @@ function TopButtonComp() {
   return (
     <Button
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      className="fixed bottom-8 left-[26.5%] rounded-full px-6 py-3 shadow-lg cursor-pointer"
+      className="fixed bottom-8 left-[26.5%] max-md:left-4 rounded-full px-6 py-3 shadow-lg cursor-pointer"
       variant={"secondary"}
     >
       <ArrowUpIcon className="w-5 h-5" />
