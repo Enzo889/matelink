@@ -36,9 +36,9 @@ const navItems = [
   { label: "Home", href: "/", icon: HomeIcon },
   { label: "Explore", href: "/explore", icon: CompassIcon },
   { label: "Notifications", href: "/notifications", icon: BellIcon },
-  { label: "Messages", href: "/messages", icon: MailIcon },
+  { label: "Messages", href: "/message", icon: MailIcon },
   { label: "Profile", href: "/profile", icon: UserIcon },
-  { label: "Job Offers", href: "/job-offers", icon: BriefcaseIcon },
+  { label: "Job Offers", href: "/job", icon: BriefcaseIcon },
   { label: "Marketplace", href: "/marketplace", icon: ShoppingCartIcon },
 ];
 
@@ -46,7 +46,7 @@ const popoverItems = [
   { label: "Premium", href: "/premium", icon: CrownIcon },
   { label: "Saved", href: "/saved", icon: BookmarkIcon },
   { label: "Organizations", href: "/organizations", icon: Building2Icon },
-  { label: "Ads", href: "/ads", icon: MegaphoneIcon },
+  { label: "Ads", href: "/premium", icon: MegaphoneIcon },
   { label: "Settings", href: "/settings", icon: SettingsIcon },
   { label: "Privacy", href: "/privacy", icon: ShieldIcon },
 ];

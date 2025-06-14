@@ -42,7 +42,7 @@ export default function PostOptions({offsetNumber = 8}: Props) {
         onMouseDown={(e) => e.stopPropagation()}
       >
         <Card className="overflow-hidden rounded-xl shadow-none border-0">
-          <CardHeader className="bg-muted/30 ">
+          <CardHeader >
             <CardTitle className="text-lg font-semibold">
               Post Interaction Settings
             </CardTitle>

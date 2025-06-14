@@ -1,6 +1,7 @@
 import Navbar from "@/components/navbar";
 import { ReactNode } from "react";
 import AsideComponent from "./components/aside/aside-main";
+import ButtonPost from "./components/button-post";
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
@@ -9,11 +10,14 @@ export default function Layout({ children }: { children: ReactNode }) {
         <Navbar />
       </nav>
 
-      <main className="w-[45%] h-full  border-x-2 max-md:w-full max-md:border-none ">{children}</main>
+      <main className="w-[45%] h-full  border-x-2 max-md:w-full max-md:border-none ">
+        {children}
+      </main>
 
       <aside className="w-[30%] h-full px-4 py-6   max-md:hidden  ">
         <AsideComponent />
       </aside>
+      <ButtonPost />
     </div>
   );
 }
