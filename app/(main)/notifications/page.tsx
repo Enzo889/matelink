@@ -1,9 +1,12 @@
-import React from 'react'
+import React from "react";
+import HeaderNoti from "./__components/headerNoti";
 
 function NotificationPage() {
   return (
-    <div>NotificationPage</div>
-  )
+    <div>
+      <HeaderNoti />
+    </div>
+  );
 }
 
-export default NotificationPage
+export default NotificationPage;
