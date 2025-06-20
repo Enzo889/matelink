@@ -6,7 +6,7 @@ function ItemsMarketplace() {
     const offers = [
         {
           id: 1,
-          href: "/product/1",
+          href: "/marketplace/1",
           image: "/1.jpg",
           alt: "brown hoodie",
           name: "Brown Hoodie",
@@ -19,7 +19,7 @@ function ItemsMarketplace() {
         },
         {
           id: 2,
-          href: "/product/2",
+          href: "/marketplace/2",
           image: "/3.webp",
           alt: " black sweatshirt without hood",
           name: "Black Sweatshirt",

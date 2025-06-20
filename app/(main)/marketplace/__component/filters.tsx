@@ -7,6 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import React, { useState } from 'react'
+import { SlidersHorizontalIcon } from 'lucide-react'
 
 function FiltersMarketplace() {
   const [priceRange, setPriceRange] = useState([0, 1000])
@@ -28,7 +29,7 @@ function FiltersMarketplace() {
     <div>
       <Popover open={open} onOpenChange={setOpen}>
         <Button asChild className="cursor-pointer">
-          <PopoverTrigger>Filters</PopoverTrigger>
+          <PopoverTrigger> <SlidersHorizontalIcon /> Filters</PopoverTrigger>
         </Button>
         <PopoverContent className="w-80">
           <div className="flex flex-col gap-6 p-4">

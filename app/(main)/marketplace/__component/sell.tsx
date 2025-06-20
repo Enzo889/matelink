@@ -29,6 +29,8 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import React, { useState } from "react";
 import Image from "next/image";
+import { categories } from "./data/category-data";
+import { ArrowUpFromLineIcon } from "lucide-react";
 
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -72,12 +74,12 @@ function Sell() {
   return (
     <div>
       <Dialog>
-        <Button asChild className="cursor-pointer">
-          <DialogTrigger>Sell </DialogTrigger>
+        <Button asChild  className="cursor-pointer">
+           <DialogTrigger> <ArrowUpFromLineIcon/>  Sell </DialogTrigger>
         </Button>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Create New Listing</DialogTitle>
+            <DialogTitle>Create New Sell</DialogTitle>
           </DialogHeader>
 
           <Form {...form}>
@@ -156,12 +158,12 @@ function Sell() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="electronics">
-                            Electronics
-                          </SelectItem>
-                          <SelectItem value="clothing">Clothing</SelectItem>
-                          <SelectItem value="books">Books</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
+                         {categories.map((category) => (
+                            <SelectItem key={category.id} value={category.name}>
+                              {category.name}
+                            </SelectItem>
+                          )
+                         )}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -187,8 +189,7 @@ function Sell() {
                         <SelectContent>
                           <SelectItem value="new">New</SelectItem>
                           <SelectItem value="like-new">Like New</SelectItem>
-                          <SelectItem value="good">Good</SelectItem>
-                          <SelectItem value="fair">Fair</SelectItem>
+                          <SelectItem value="used">Used</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
