@@ -9,15 +9,27 @@ import { Input } from "@/components/ui/input"
 import React, { useState } from 'react'
 import { SlidersHorizontalIcon } from 'lucide-react'
 
-function FiltersMarketplace() {
-  const [priceRange, setPriceRange] = useState([0, 1000])
-  const [location, setLocation] = useState("")
-  const [condition, setCondition] = useState("new")
+interface FiltersMarketplaceProps {
+  onFiltersChange: (filters: {
+    priceRange: number[];
+    location: string;
+    condition: string;
+  }) => void;
+  currentFilters: {
+    priceRange: number[];
+    location: string;
+    condition: string;
+  };
+}
+
+function FiltersMarketplace({ onFiltersChange, currentFilters }: FiltersMarketplaceProps) {
+  const [priceRange, setPriceRange] = useState(currentFilters.priceRange)
+  const [location, setLocation] = useState(currentFilters.location)
+  const [condition, setCondition] = useState(currentFilters.condition)
   const [open, setOpen] = useState(false)
 
   const handleApplyFilters = () => {
-    // Handle the filter states here
-    console.log({
+    onFiltersChange({
       priceRange,
       location,
       condition

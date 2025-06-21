@@ -1,14 +1,8 @@
 import React from "react";
-import ItemsMarketplace from "./__component/items";
-import HeaderMarketplace from "./__component/header";
+import MarketplaceContainer from "./__component/marketplace-container";
 
 function MarketplacePage() {
-  return (
-    <div>
-      <HeaderMarketplace />
-      <ItemsMarketplace />
-    </div>
-  );
+  return <MarketplaceContainer />;
 }
 
 export default MarketplacePage;

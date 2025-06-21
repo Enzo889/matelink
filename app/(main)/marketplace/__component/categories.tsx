@@ -9,8 +9,12 @@ import React, { useState } from "react";
 import { categories } from "./data/category-data";
 
 
-function Categories() {
-  const [selectedCategory, setSelectedCategory] = useState(categories[0]);
+interface CategoriesProps {
+  onCategoryChange: (category: { id: number; name: string }) => void;
+  selectedCategory: { id: number; name: string };
+}
+
+function Categories({ onCategoryChange, selectedCategory }: CategoriesProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -31,7 +35,7 @@ function Categories() {
                 variant={selectedCategory.id === category.id ? "default" : "ghost"}
                 className="cursor-pointer"
                 onClick={() => {
-                  setSelectedCategory(category as typeof categories[0]);
+                  onCategoryChange(category);
                   setIsOpen(false);
                 }}
               >
