@@ -10,8 +10,9 @@ function MarketplaceContainer() {
   const [filters, setFilters] = useState({
     priceRange: [0, 1000],
     location: "",
-    condition: "new"
+    condition: "any"
   });
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleCategoryChange = (category: { id: number; name: string }) => {
     setSelectedCategory(category);
@@ -25,6 +26,10 @@ function MarketplaceContainer() {
     setFilters(newFilters);
   };
 
+  const handleSearchChange = (term: string) => {
+    setSearchTerm(term);
+  };
+
   return (
     <div>
       <HeaderMarketplace 
@@ -32,10 +37,17 @@ function MarketplaceContainer() {
         onCategoryChange={handleCategoryChange}
         filters={filters}
         onFiltersChange={handleFiltersChange}
+        searchTerm={searchTerm}
+        onSearchChange={handleSearchChange}
       />
       <ItemsMarketplace 
         selectedCategory={selectedCategory}
-        filters={filters}
+        filters={{
+          priceRange: filters.priceRange as [number, number],
+          location: filters.location,
+          condition: filters.condition
+        }}
+        searchTerm={searchTerm}
       />
     </div>
   );

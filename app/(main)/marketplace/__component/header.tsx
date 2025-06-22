@@ -19,9 +19,11 @@ interface HeaderMarketplaceProps {
     location: string;
     condition: string;
   }) => void;
+  searchTerm: string;
+  onSearchChange: (term: string) => void;
 }
 
-function HeaderMarketplace({ selectedCategory, onCategoryChange, filters, onFiltersChange }: HeaderMarketplaceProps) {
+function HeaderMarketplace({ selectedCategory, onCategoryChange, filters, onFiltersChange, searchTerm, onSearchChange }: HeaderMarketplaceProps) {
   return (
     <header className='flex flex-col w-full h-fit p-2 border-b-2 gap-5'>
         <span className='flex flex-col gap-1.5  '>
@@ -33,7 +35,10 @@ function HeaderMarketplace({ selectedCategory, onCategoryChange, filters, onFilt
         </div>
        <ShoppingCart/>
             </span>
-        <SearchMarketplace/>
+        <SearchMarketplace 
+          searchTerm={searchTerm}
+          onSearchChange={onSearchChange}
+        />
         </span>
         <div className='flex w-full justify-around'>
          <Sell/>

@@ -4,45 +4,11 @@ import BackButton from '@/components/back-button';
 import { Button } from '@/components/ui/button';
 import { ShoppingCartIcon, HeartIcon, ShareIcon } from 'lucide-react';
 import ShoppingCart from '../__component/cart';
+import { products } from '../__component/data/product-data';
 
 // Example data - in a real application, this would come from a database
 const getProductData = (id: string) => {
-  const products = {
-    '1': {
-      id: 1,
-      name: "Brown Hoodie",
-      image: "/1.jpg",
-      alt: "brown hoodie",
-      stock: "Only 2 left in stock",
-      oldPrice: "$30.99",
-      price: "$19.99",
-      discount: "35% off",
-      installments: "Or 9 installments of $2.22",
-      shipping: "Free Shipping",
-      description: "Comfortable brown hoodie made with premium cotton blend. Perfect for casual wear and outdoor activities. Features a spacious front pocket and adjustable drawstring hood.",
-      category: "Fashion & Apparel",
-      condition: "New",
-      seller: "Fashion Store",
-      location: "New York, NY"
-    },
-    '2': {
-      id: 2,
-      name: "Black Sweatshirt",
-      image: "/3.webp",
-      alt: "black sweatshirt without hood",
-      stock: "Only 5 left in stock",
-      oldPrice: "$45.00",
-      price: "$29.99",
-      discount: "33% off",
-      installments: "Or 6 installments of $5.00",
-      shipping: "Free Shipping",
-      description: "Classic black sweatshirt without hood. Made from soft fleece material for maximum comfort. Perfect for layering or wearing on its own.",
-      category: "Fashion & Apparel",
-      condition: "New",
-      seller: "Comfort Wear",
-      location: "Los Angeles, CA"
-    }
-  };
+
   
   return products[id as keyof typeof products] || null;
 };
