@@ -109,17 +109,44 @@ function ItemsMarketplace({
                     Add to Cart
                   </Button>
                   {offer.isOwner && (
-                    // edir button
-
                     <>
-                      <EditItem />
+                      <EditItem 
+                        item={{
+                          id: offer.id.toString(),
+                          title: offer.name,
+                          price: offer.price,
+                          category: offer.category,
+                          condition: offer.condition,
+                          description: offer.description,
+                          location: offer.location,
+                          images: [offer.image],
+                          categoryId: offer.categoryId
+                        }}
+                        onSuccess={() => {
+                          // Refresh the items list or show success message
+                          console.log("Item updated successfully");
+                        }}
+                      />
                       <Button
                         variant="ghost"
                         size="sm"
                         className="justify-start h-8 text-red-600 hover:text-red-700 hover:bg-red-50"
-                        onClick={() => {
-                          // Handle delete logic here
-                          console.log("Delete item:", offer.id);
+                        onClick={async () => {
+                          try {
+                            const response = await fetch(`http://localhost:8080/offers/api/v1/${offer.id}`, {
+                              method: 'DELETE',
+                            });
+                            
+                            if (response.ok) {
+                              console.log("Item deleted successfully:", offer.id);
+                              // Here you would typically refresh the items list
+                              // or remove the item from the local state
+                            } else {
+                              console.error("Failed to delete item");
+                            }
+                          } catch (error) {
+                            console.error("Error deleting item:", error);
+                          }
                         }}
                       >
                         <Trash2 className="h-4 w-4 mr-2" />

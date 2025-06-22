@@ -27,10 +27,30 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { categories } from "./data/category-data";
-import { Edit } from "lucide-react";
+import { ArrowUpFromLineIcon, Edit, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+
+// Types and interfaces
+interface OfferItem {
+  id: string;
+  title: string;
+  price: number;
+  category: string;
+  condition: string;
+  description: string;
+  location: string;
+  images?: string[];
+  categoryId?: number;
+}
+
+interface EditItemProps {
+  item?: OfferItem;
+  onSuccess?: () => void;
+  onCancel?: () => void;
+}
 
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -41,20 +61,37 @@ const formSchema = z.object({
   location: z.string().min(3, "Location is required"),
 });
 
-function EditItem() {
-  const [images, setImages] = useState<string[]>([]);
+function EditItem({ item, onSuccess, onCancel }: EditItemProps) {
+  const [images, setImages] = useState<string[]>(item?.images || []);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: "",
-      price: "",
-      category: "",
-      condition: "",
-      description: "",
-      location: "",
+      title: item?.title || "",
+      price: item?.price?.toString() || "",
+      category: item?.category || "",
+      condition: item?.condition || "",
+      description: item?.description || "",
+      location: item?.location || "",
     },
   });
+
+  // Reset form when item changes
+  useEffect(() => {
+    if (item) {
+      form.reset({
+        title: item.title,
+        price: item.price.toString(),
+        category: item.category,
+        condition: item.condition,
+        description: item.description,
+        location: item.location,
+      });
+      setImages(item.images || []);
+    }
+  }, [item, form]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -66,28 +103,110 @@ function EditItem() {
     }
   };
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values, images);
-    // Handle form submission here
+  // API Functions
+  const updateOffer = async (offerId: string, offerData: any) => {
+    const response = await fetch(`http://localhost:8080/offers/api/v1/${offerId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(offerData),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to update offer');
+    }
+    
+    return response.json();
+  };
+
+  const createOffer = async (offerData: any) => {
+    const response = await fetch('http://localhost:8080/offers/api/v1', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(offerData),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to create offer');
+    }
+    
+    return response.json();
+  };
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsLoading(true);
+    
+    try {
+      const offerData = {
+        ...values,
+        price: parseFloat(values.price),
+        images: images,
+        categoryId: categories.find(cat => cat.name === values.category)?.id || 1,
+      };
+
+      if (item?.id) {
+        // Update existing offer
+        await updateOffer(item.id, offerData);
+        toast.success('Offer updated successfully!');
+      } else {
+        // Create new offer
+        await createOffer(offerData);
+        toast.success('Offer created successfully!');
+      }
+      
+      setIsOpen(false);
+      form.reset();
+      setImages([]);
+      onSuccess?.();
+    } catch (error) {
+      console.error('Error submitting offer:', error);
+      toast.error(item?.id ? 'Failed to update offer' : 'Failed to create offer');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setIsOpen(false);
+    form.reset();
+    setImages(item?.images || []);
+    onCancel?.();
   };
 
   return (
     <div>
-      <Dialog>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        {!item?.id ?  <Button 
+          asChild  
+          className="cursor-pointer"
+          onClick={() => setIsOpen(true)}
+        >
+           <DialogTrigger> 
+             <ArrowUpFromLineIcon/>  
+             Sell 
+           </DialogTrigger>
+        </Button> : 
         <Button
-          asChild
-          variant="ghost"
-          size="sm"
+        asChild
+        variant="ghost"
+        size="sm"
           className=" w-full justify-start h-8  cursor-pointer"
+          onClick={() => setIsOpen(true)}
         >
           <DialogTrigger>
             {" "}
             <Edit className="h-4 w-4 mr-2" /> Edit{" "}
           </DialogTrigger>
         </Button>
+        }
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Create New Sell</DialogTitle>
+            <DialogTitle>
+              {item?.id ? 'Edit Offer' : 'Create New Offer'}
+            </DialogTitle>
           </DialogHeader>
 
           <Form {...form}>
@@ -233,9 +352,31 @@ function EditItem() {
                 )}
               />
 
-              <Button type="submit" className="w-full">
-                Create Listing
-              </Button>
+              <div className="flex gap-2 pt-4">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={handleCancel}
+                  disabled={isLoading}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit" 
+                  className="flex-1"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {item?.id ? 'Updating...' : 'Creating...'}
+                    </>
+                  ) : (
+                    item?.id ? 'Update Offer' : 'Create Offer'
+                  )}
+                </Button>
+              </div>
             </form>
           </Form>
         </DialogContent>
