@@ -31,18 +31,26 @@ function ItemsMarketplace({
 }: ItemsMarketplaceProps) {
   const allOffers = products;
 
+  // Calculate final price based on oldPrice and discount
+  const calculatePrice = (oldPrice: number, discount: number | null): number => {
+    if (!discount) return oldPrice;
+    return oldPrice * (1 - discount / 100);
+  };
+
   // Filter offers based on selected category, filters, and search term
   const filteredOffers = Object.values(allOffers).filter((offer) => {
+    const finalPrice = calculatePrice(offer.price, offer.discount);
+
     // Category filter
     const categoryMatch =
       !selectedCategory ||
       selectedCategory.id === 1 ||
-      offer.categoryId === selectedCategory.id;
+      offer.categoryId === selectedCategory.id || (selectedCategory.id === 2 && offer.discount)  ;
 
-    // Price filter
+    // Price filter using calculated final price
     const priceMatch =
-      offer.price >= filters.priceRange[0] &&
-      offer.price <= filters.priceRange[1];
+      finalPrice >= filters.priceRange[0] &&
+      finalPrice <= filters.priceRange[1];
 
     // Condition filter
     const conditionMatch =
@@ -77,126 +85,132 @@ function ItemsMarketplace({
           </p>
         </div>
       ) : (
-        filteredOffers.map((offer) => (
-          <div key={offer.id} className="w-full relative">
-            {/* Options Popover - Moved outside Link */}
-            <Popover>
-              <PopoverTrigger asChild className="z-10">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 w-8 p-0 cursor-pointer absolute top-2 right-2"
-                >
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-40 p-2">
-                <div className="flex flex-col gap-1">
+        filteredOffers.map((offer) => {
+          const finalPrice = calculatePrice(offer.price, offer.discount);
+          
+          return (
+            <div key={offer.id} className="w-full relative">
+              {/* Options Popover - Moved outside Link */}
+              <Popover>
+                <PopoverTrigger asChild className="z-10">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="justify-start h-8"
+                    className="h-8 w-8 p-0 cursor-pointer absolute top-2 right-2"
                   >
-                    <Heart className="h-4 w-4 mr-2" />
-                    Add to Favorites
+                    <MoreHorizontal className="h-4 w-4" />
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="justify-start h-8"
-                  >
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    Add to Cart
-                  </Button>
-                  {offer.isOwner && (
-                    <>
-                      <EditItem 
-                        item={{
-                          id: offer.id.toString(),
-                          title: offer.name,
-                          price: offer.price,
-                          category: offer.category,
-                          condition: offer.condition,
-                          description: offer.description,
-                          location: offer.location,
-                          images: [offer.image],
-                          categoryId: offer.categoryId
-                        }}
-                        onSuccess={() => {
-                          // Refresh the items list or show success message
-                          console.log("Item updated successfully");
-                        }}
-                      />
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="justify-start h-8 text-red-600 hover:text-red-700 hover:bg-red-50"
-                        onClick={async () => {
-                          try {
-                            const response = await fetch(`http://localhost:8080/offers/api/v1/${offer.id}`, {
-                              method: 'DELETE',
-                            });
-                            
-                            if (response.ok) {
-                              console.log("Item deleted successfully:", offer.id);
-                              // Here you would typically refresh the items list
-                              // or remove the item from the local state
-                            } else {
-                              console.error("Failed to delete item");
+                </PopoverTrigger>
+                <PopoverContent className="w-40 p-2">
+                  <div className="flex flex-col gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="justify-start h-8"
+                    >
+                      <Heart className="h-4 w-4 mr-2" />
+                      Add to Favorites
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="justify-start h-8"
+                    >
+                      <ShoppingCart className="h-4 w-4 mr-2" />
+                      Add to Cart
+                    </Button>
+                    {offer.isOwner && (
+                      <>
+                        <EditItem 
+                          item={{
+                            id: offer.id.toString(),
+                            title: offer.name,
+                            price: finalPrice,
+                            category: offer.category,
+                            condition: offer.condition,
+                            description: offer.description,
+                            location: offer.location,
+                            images: [offer.image],
+                            categoryId: offer.categoryId
+                          }}
+                          onSuccess={() => {
+                            // Refresh the items list or show success message
+                            console.log("Item updated successfully");
+                          }}
+                        />
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="justify-start h-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                          onClick={async () => {
+                            try {
+                              const response = await fetch(`http://localhost:8080/offers/api/v1/${offer.id}`, {
+                                method: 'DELETE',
+                              });
+                              
+                              if (response.ok) {
+                                console.log("Item deleted successfully:", offer.id);
+                                // Here you would typically refresh the items list
+                                // or remove the item from the local state
+                              } else {
+                                console.error("Failed to delete item");
+                              }
+                            } catch (error) {
+                              console.error("Error deleting item:", error);
                             }
-                          } catch (error) {
-                            console.error("Error deleting item:", error);
-                          }
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </PopoverContent>
-            </Popover>
-
-            <Link
-              href={offer.href}
-              className="hover:bg-foreground/5 transition-colors block"
-            >
-              <div className="flex items-center gap-4 border p-4">
-                <Image
-                  src={offer.image}
-                  width={70}
-                  height={100}
-                  alt={offer.alt}
-                />
-                <div>
-                  <p className="text-sm font-medium">{offer.name}</p>
-                  <p className="text-xs text-foreground/50">{offer.stock}</p>
-                  <p className="text-xs text-foreground/40 capitalize">
-                    {offer.condition} • {offer.location}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm line-through text-foreground/50">
-                      ${offer.oldPrice.toFixed(2)}
-                    </p>
-                    <p className="text-sm font-semibold text-green-600">
-                      ${offer.price.toFixed(2)}
-                    </p>
-                    <span className="text-xs uppercase font-light text-green-500">
-                      {offer.discount}
-                    </span>
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete
+                        </Button>
+                      </>
+                    )}
                   </div>
-                  <p className="text-xs text-foreground/70">
-                    {offer.installments}
-                  </p>
-                  <p className="text-xs text-green-600 font-medium">
-                    {offer.shipping}
-                  </p>
+                </PopoverContent>
+              </Popover>
+
+              <Link
+                href={offer.href}
+                className="hover:bg-foreground/5 transition-colors block"
+              >
+                <div className="flex items-center gap-4 border p-4">
+                  <Image
+                    src={offer.image}
+                    width={70}
+                    height={100}
+                    alt={offer.alt}
+                  />
+                  <div>
+                    <p className="text-sm font-medium">{offer.name}</p>
+                    <p className="text-xs text-foreground/50">{offer.stock}</p>
+                    <p className="text-xs text-foreground/40 capitalize">
+                      {offer.condition} • {offer.location}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      {offer.discount && (
+                        <p className="text-sm line-through text-foreground/50">
+                          ${offer.price.toFixed(2)}
+                        </p>
+                      )}
+                      <p className="text-sm font-semibold text-green-600">
+                        ${finalPrice.toFixed(2)}
+                      </p>
+                      <span className="text-xs uppercase font-light text-green-500">
+                        {offer.discount ? `${offer.discount}% off`: ""}
+                      </span>
+                    </div>
+                    <p className="text-xs text-foreground/70">
+                      {offer.installments}
+                    </p>
+                    <p className="text-xs text-green-600 font-medium">
+                      {offer.shipping}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </Link>
-          </div>
-        ))
+              </Link>
+            </div>
+          );
+        })
       )}
     </div>
   );

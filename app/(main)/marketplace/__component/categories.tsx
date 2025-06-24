@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/popover";
 import React, { useState } from "react";
 import { categories } from "./data/category-data";
+import { ArrowDownIcon } from "lucide-react";
 
 
 interface CategoriesProps {
@@ -25,7 +26,7 @@ function Categories({ onCategoryChange, selectedCategory }: CategoriesProps) {
           className="cursor-pointer"
           variant={"outline"}
         >
-          <PopoverTrigger>{selectedCategory.name}</PopoverTrigger>
+          <PopoverTrigger><ArrowDownIcon/> {selectedCategory.name}</PopoverTrigger>
         </Button>
         <PopoverContent className="w-fit">
           <div className="flex flex-col">
