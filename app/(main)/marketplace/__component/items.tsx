@@ -11,6 +11,7 @@ import { Heart, ShoppingCart, MoreHorizontal, Trash2 } from "lucide-react";
 import { Category } from "./data/category-data";
 import { products } from "./data/product-data";
 import EditItem from "./edit";
+import { offersApi } from "./api";
 
 interface Filters {
   priceRange: [number, number];
@@ -32,7 +33,10 @@ function ItemsMarketplace({
   const allOffers = products;
 
   // Calculate final price based on oldPrice and discount
-  const calculatePrice = (oldPrice: number, discount: number | null): number => {
+  const calculatePrice = (
+    oldPrice: number,
+    discount: number | null
+  ): number => {
     if (!discount) return oldPrice;
     return oldPrice * (1 - discount / 100);
   };
@@ -45,7 +49,8 @@ function ItemsMarketplace({
     const categoryMatch =
       !selectedCategory ||
       selectedCategory.id === 1 ||
-      offer.categoryId === selectedCategory.id || (selectedCategory.id === 2 && offer.discount)  ;
+      offer.categoryId === selectedCategory.id ||
+      (selectedCategory.id === 2 && offer.discount);
 
     // Price filter using calculated final price
     const priceMatch =
@@ -56,7 +61,7 @@ function ItemsMarketplace({
     const conditionMatch =
       offer.condition === filters.condition || filters.condition === "any";
 
-    // Location filter (case insensitive partial match)
+    // Location filter (case insensitive partial mWatch)
     const locationMatch =
       filters.location === "" ||
       offer.location.toLowerCase().includes(filters.location.toLowerCase());
@@ -87,7 +92,7 @@ function ItemsMarketplace({
       ) : (
         filteredOffers.map((offer) => {
           const finalPrice = calculatePrice(offer.price, offer.discount);
-          
+
           return (
             <div key={offer.id} className="w-full relative">
               {/* Options Popover - Moved outside Link */}
@@ -121,7 +126,7 @@ function ItemsMarketplace({
                     </Button>
                     {offer.isOwner && (
                       <>
-                        <EditItem 
+                        <EditItem
                           item={{
                             id: offer.id.toString(),
                             title: offer.name,
@@ -131,7 +136,7 @@ function ItemsMarketplace({
                             description: offer.description,
                             location: offer.location,
                             images: [offer.image],
-                            categoryId: offer.categoryId
+                            categoryId: offer.categoryId,
                           }}
                           onSuccess={() => {
                             // Refresh the items list or show success message
@@ -142,23 +147,6 @@ function ItemsMarketplace({
                           variant="ghost"
                           size="sm"
                           className="justify-start h-8 text-red-600 hover:text-red-700 hover:bg-red-50"
-                          onClick={async () => {
-                            try {
-                              const response = await fetch(`http://localhost:8080/offers/api/v1/${offer.id}`, {
-                                method: 'DELETE',
-                              });
-                              
-                              if (response.ok) {
-                                console.log("Item deleted successfully:", offer.id);
-                                // Here you would typically refresh the items list
-                                // or remove the item from the local state
-                              } else {
-                                console.error("Failed to delete item");
-                              }
-                            } catch (error) {
-                              console.error("Error deleting item:", error);
-                            }
-                          }}
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
                           Delete
@@ -196,7 +184,7 @@ function ItemsMarketplace({
                         ${finalPrice.toFixed(2)}
                       </p>
                       <span className="text-xs uppercase font-light text-green-500">
-                        {offer.discount ? `${offer.discount}% off`: ""}
+                        {offer.discount ? `${offer.discount}% off` : ""}
                       </span>
                     </div>
                     <p className="text-xs text-foreground/70">

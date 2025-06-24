@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState } from "react";
 import ItemsMarketplace from "./items";
@@ -10,7 +10,7 @@ function MarketplaceContainer() {
   const [filters, setFilters] = useState({
     priceRange: [0, 1000],
     location: "",
-    condition: "any"
+    condition: "any",
   });
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -32,7 +32,7 @@ function MarketplaceContainer() {
 
   return (
     <div>
-      <HeaderMarketplace 
+      <HeaderMarketplace
         selectedCategory={selectedCategory}
         onCategoryChange={handleCategoryChange}
         filters={filters}
@@ -40,12 +40,12 @@ function MarketplaceContainer() {
         searchTerm={searchTerm}
         onSearchChange={handleSearchChange}
       />
-      <ItemsMarketplace 
+      <ItemsMarketplace
         selectedCategory={selectedCategory}
         filters={{
           priceRange: filters.priceRange as [number, number],
           location: filters.location,
-          condition: filters.condition
+          condition: filters.condition,
         }}
         searchTerm={searchTerm}
       />
