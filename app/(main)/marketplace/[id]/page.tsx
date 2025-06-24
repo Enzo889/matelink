@@ -1,16 +1,19 @@
-import React from 'react';
-import Image from 'next/image';
-import BackButton from '@/components/back-button';
-import { Button } from '@/components/ui/button';
-import { ShoppingCartIcon, HeartIcon, ShareIcon } from 'lucide-react';
-import ShoppingCart from '../__component/cart';
-import { products } from '../__component/data/product-data';
+import React from "react";
+import Image from "next/image";
+import BackButton from "@/components/back-button";
+import { Button } from "@/components/ui/button";
+import { ShoppingCartIcon, HeartIcon, ShareIcon } from "lucide-react";
+import ShoppingCart from "../__component/cart";
+import { products } from "../__component/data/product-data";
 
 // Example data - in a real application, this would come from a database
 const getProductData = (id: string) => {
-
-  
   return products[id as keyof typeof products] || null;
+};
+
+const calculatePrice = (oldPrice: number, discount: number | null): number => {
+  if (!discount) return oldPrice;
+  return oldPrice * (1 - discount / 100);
 };
 
 interface ProductPageProps {
@@ -22,11 +25,15 @@ interface ProductPageProps {
 function ProductPage({ params }: ProductPageProps) {
   const product = getProductData(params.id);
 
+  const finalPrice = calculatePrice(product.price, product.discount);
+
   if (!product) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4">
         <h1 className="text-2xl font-bold mb-4">Product not found</h1>
-        <p className="text-muted-foreground mb-4">The product you are looking for does not exist.</p>
+        <p className="text-muted-foreground mb-4">
+          The product you are looking for does not exist.
+        </p>
         <BackButton />
       </div>
     );
@@ -36,10 +43,9 @@ function ProductPage({ params }: ProductPageProps) {
     <div className="w-full ">
       {/* Header */}
       <div className="flex justify-between mb-6 items-center gap-4 p-4 border-b-2">
-        <span className='flex'>
-
-        <BackButton />
-        <h1 className="text-2xl font-bold mb-4">Product Details</h1>
+        <span className="flex">
+          <BackButton />
+          <h1 className="text-2xl font-bold mb-4">Product Details</h1>
         </span>
         <ShoppingCart />
       </div>
@@ -62,19 +68,33 @@ function ProductPage({ params }: ProductPageProps) {
         <div className="space-y-6">
           <div>
             <h2 className="text-3xl font-bold mb-2">{product.name}</h2>
-            <p className="text-sm text-muted-foreground mb-4">{product.stock}</p>
-            
+            <p className="text-sm text-muted-foreground mb-4">
+              {product.stock}
+            </p>
+
             {/* Prices */}
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-2xl font-bold text-green-600">{product.price}</span>
-              <span className="text-lg line-through text-muted-foreground">{product.oldPrice}</span>
-              <span className="text-sm uppercase font-medium text-green-500 bg-green-50 px-2 py-1 rounded">
-                {product.discount}
+              <span className="text-2xl font-bold text-green-600">
+                ${finalPrice}
               </span>
+              {product.discount && (
+                <>
+                  <span className="text-lg line-through text-muted-foreground">
+                    ${product.price}
+                  </span>
+                  <span className="text-sm uppercase font-medium text-green-500 bg-green-50 px-2 py-1 rounded">
+                    {product.discount}% OFF
+                  </span>
+                </>
+              )}
             </div>
-            
-            <p className="text-sm text-muted-foreground mb-2">{product.installments}</p>
-            <p className="text-sm text-green-600 font-medium mb-6">{product.shipping}</p>
+
+            <p className="text-sm text-muted-foreground mb-2">
+              {product.installments}
+            </p>
+            <p className="text-sm text-green-600 font-medium mb-6">
+              {product.shipping}
+            </p>
           </div>
 
           {/* Action buttons */}
@@ -83,7 +103,7 @@ function ProductPage({ params }: ProductPageProps) {
               <ShoppingCartIcon className="w-5 h-5 mr-2" />
               Add to Cart
             </Button>
-            
+
             <div className="flex gap-3">
               <Button variant="outline" className="flex-1 cursor-pointer">
                 <HeartIcon className="w-4 h-4 mr-2" />
@@ -102,7 +122,7 @@ function ProductPage({ params }: ProductPageProps) {
               <h3 className="font-semibold mb-2">Description</h3>
               <p className="text-muted-foreground">{product.description}</p>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="font-medium">Category:</span>

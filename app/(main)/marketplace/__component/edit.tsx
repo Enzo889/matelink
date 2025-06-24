@@ -73,7 +73,7 @@ function EditItem({ item, onSuccess, onCancel }: EditItemProps) {
     defaultValues: {
       title: item?.title || "",
       price: item?.price?.toString() || "",
-      discount: item?.discount?.toString() || "",
+      discount: item?.discount?.toString() || "0",
       category: item?.category || "",
       condition: item?.condition || "",
       description: item?.description || "",
@@ -87,7 +87,7 @@ function EditItem({ item, onSuccess, onCancel }: EditItemProps) {
       form.reset({
         title: item.title,
         price: item.price.toString(),
-        discount: item.discount?.toString() || "",
+        discount: item.discount?.toString() || "0",
         category: item.category,
         condition: item.condition,
         description: item.description,
@@ -150,7 +150,7 @@ function EditItem({ item, onSuccess, onCancel }: EditItemProps) {
       const offerData = {
         ...values,
         price: parseFloat(values.price),
-        discount: values.discount ? parseFloat(values.discount) : undefined,
+        discount: values.discount ? parseFloat(values.discount) : 0,
         images: images,
         categoryId:
           categories.find((cat) => cat.name === values.category)?.id || 1,
@@ -265,7 +265,7 @@ function EditItem({ item, onSuccess, onCancel }: EditItemProps) {
                 )}
               />
 
-              <span className="flex gap-3">
+              <span className="flex gap-2">
                 <FormField
                   control={form.control}
                   name="price"
@@ -285,11 +285,11 @@ function EditItem({ item, onSuccess, onCancel }: EditItemProps) {
                   name="discount"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>Discount (%)</FormLabel>
+                      <FormLabel>Discount</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
-                          placeholder="Optional discount"
+                          placeholder="0"
                           min="0"
                           max="100"
                           {...field}
