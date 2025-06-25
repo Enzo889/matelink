@@ -32,6 +32,8 @@ import Image from "next/image";
 import { categories } from "./data/category-data";
 import { ArrowUpFromLineIcon, Edit, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { offersApi } from "./api";
+import { OffersInterface } from "./data/product-data";
 
 // Types and interfaces
 interface OfferItem {
@@ -108,39 +110,24 @@ function EditItem({ item, onSuccess, onCancel }: EditItemProps) {
   };
 
   // API Functions
-  const updateOffer = async (offerId: string, offerData: any) => {
-    const response = await fetch(
-      `http://localhost:8080/offers/api/v1/${offerId}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(offerData),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to update offer");
+  const updateOffer = async (offerId: string, offerData: OffersInterface) => {
+    try {
+      await offersApi.update(offerId, offerData);
+      toast.success("Offer updated successfully!");
+    } catch (error) {
+      console.error("Error updating offer:", error);
+      toast.error("Failed to update offer");
     }
-
-    return response.json();
   };
 
-  const createOffer = async (offerData: any) => {
-    const response = await fetch("http://localhost:8080/offers/api/v1", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(offerData),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to create offer");
+  const createOffer = async (offerData: OffersInterface) => {
+    try {
+      await offersApi.create(offerData);
+      toast.success("Offer created successfully!");
+    } catch (error) {
+      console.error("Error creating offer:", error);
+      toast.error("Failed to create offer");
     }
-
-    return response.json();
   };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {

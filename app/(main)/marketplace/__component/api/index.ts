@@ -47,10 +47,10 @@ class OffersApi {
 
   async update(
     id: string | number,
-    data: OffersInterface
+    data: Partial<OffersInterface>
   ): Promise<OffersInterface> {
     const response = await fetch(`${this.baseUrl}/${id}`, {
-      method: "PUT",
+      method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
