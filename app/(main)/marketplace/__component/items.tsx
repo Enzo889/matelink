@@ -16,6 +16,17 @@ import { offersApi } from "./api";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Loading } from "@/components/loading";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface Filters {
   priceRange: [number, number];
@@ -170,7 +181,7 @@ function ItemsMarketplace({
                           item={{
                             id: offer.id.toString(),
                             title: offer.name,
-                            price: finalPrice,
+                            price: offer.price,
                             category: offer.category,
                             condition: offer.condition,
                             description: offer.description,
@@ -184,15 +195,41 @@ function ItemsMarketplace({
                             toast.success("Product updated successfully!");
                           }}
                         />
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="justify-start h-8 text-red-600 hover:text-red-700 hover:bg-red-50 cursor-pointer"
-                          onClick={() => deleteOffer(offer.id)}
-                        >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Delete
-                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="justify-start h-8 text-destructive hover:text-destructive hover:bg-red-50 cursor-pointer"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Are you sure you want to delete this product?
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This action cannot be undone. This will
+                                permanently delete the product from the
+                                marketplace.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel className="cursor-pointer">
+                                Cancel
+                              </AlertDialogCancel>
+                              <AlertDialogAction
+                                className="cursor-pointer bg-destructive text-white hover:bg-destructive/80"
+                                onClick={() => deleteOffer(offer.id)}
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </>
                     )}
                   </div>
@@ -200,7 +237,7 @@ function ItemsMarketplace({
               </Popover>
 
               <Link
-                href={offer.href}
+                href={`/marketplace/${offer.id}`}
                 className="hover:bg-foreground/5 transition-colors block"
               >
                 <div className="flex items-center gap-4 border p-4">
@@ -208,7 +245,7 @@ function ItemsMarketplace({
                     src={offer.image}
                     width={70}
                     height={100}
-                    alt={offer.alt}
+                    alt={offer.name.toLowerCase()}
                   />
                   <div>
                     <p className="text-sm font-medium">{offer.name}</p>

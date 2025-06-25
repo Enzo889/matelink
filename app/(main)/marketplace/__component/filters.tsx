@@ -94,10 +94,13 @@ function FiltersMarketplace({
                   step={10}
                   onValueChange={setPriceRange}
                 />
-                <div className="flex justify-between mt-2 text-sm text-gray-500">
-                 
-                  <span>$<NumberFlow value={priceRange[0]} /></span>
-                  <span>$<NumberFlow value={priceRange[1]} /> </span>
+                <div className="flex justify-between mt-2 text-sm ">
+                  <span>
+                    $<NumberFlow value={priceRange[0]} />
+                  </span>
+                  <span>
+                    $<NumberFlow value={priceRange[1]} />{" "}
+                  </span>
                 </div>
               </div>
             </div>
