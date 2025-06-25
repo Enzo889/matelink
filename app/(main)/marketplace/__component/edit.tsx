@@ -382,13 +382,17 @@ function EditItem({ item, onSuccess, onCancel }: EditItemProps) {
                 <Button
                   type="button"
                   variant="outline"
-                  className="flex-1"
+                  className="flex-1 cursor-pointer"
                   onClick={handleCancel}
                   disabled={isLoading}
                 >
                   Cancel
                 </Button>
-                <Button type="submit" className="flex-1" disabled={isLoading}>
+                <Button
+                  type="submit"
+                  className="flex-1 cursor-pointer"
+                  disabled={isLoading}
+                >
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
