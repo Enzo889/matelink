@@ -110,44 +110,28 @@ function EditItem({ item, onSuccess, onCancel }: EditItemProps) {
   };
 
   // API Functions
-  const updateOffer = async (offerId: string, offerData: OffersInterface) => {
-    try {
-      await offersApi.update(offerId, offerData);
-      toast.success("Offer updated successfully!");
-    } catch (error) {
-      console.error("Error updating offer:", error);
-      toast.error("Failed to update offer");
-    }
-  };
-
-  const createOffer = async (offerData: OffersInterface) => {
-    try {
-      await offersApi.create(offerData);
-      toast.success("Offer created successfully!");
-    } catch (error) {
-      console.error("Error creating offer:", error);
-      toast.error("Failed to create offer");
-    }
-  };
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
 
     try {
-      const offerData = {
-        ...values,
+      const offerData: Partial<OffersInterface> = {
+        name: values.title, // Changed from title to name
         price: parseFloat(values.price),
         discount: values.discount ? parseFloat(values.discount) : 0,
-        images: images,
+        category: values.category,
+        condition: values.condition as "new" | "like-new" | "used",
+        description: values.description,
+        location: values.location,
+        image: images.length > 0 ? images[0] : "", // Assuming single image for now
         categoryId:
           categories.find((cat) => cat.name === values.category)?.id || 1,
       };
 
       if (item?.id) {
-        await updateOffer(item.id, offerData);
+        await offersApi.update(item.id, offerData);
         toast.success("Offer updated successfully!");
       } else {
-        await createOffer(offerData);
+        await offersApi.create(offerData as OffersInterface);
         toast.success("Offer created successfully!");
       }
 
