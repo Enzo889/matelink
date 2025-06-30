@@ -323,8 +323,7 @@ function EditItem({ item, onSuccess, onCancel }: EditItemProps) {
                       <FormControl>
                         <Input
                           type="number"
-                          placeholder="0"
-                          min="0"
+                          placeholder="00"
                           max="100"
                           {...field}
                         />

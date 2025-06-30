@@ -117,8 +117,7 @@ function ItemsMarketplace({
     // Search term filter (search in name and alt)
     const searchMatch =
       searchTerm === "" ||
-      offer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      offer.alt.toLowerCase().includes(searchTerm.toLowerCase());
+      offer.name.toLowerCase().includes(searchTerm.toLowerCase());
 
     return (
       categoryMatch &&
@@ -187,7 +186,7 @@ function ItemsMarketplace({
                             description: offer.description,
                             location: offer.location,
                             images: [offer.image],
-                            discount: offer.discount ?? undefined,
+                            discount: offer.discount || 0,
                             categoryId: offer.categoryId,
                           }}
                           onSuccess={() => {
@@ -254,10 +253,12 @@ function ItemsMarketplace({
                       {offer.condition} • {offer.location}
                     </p>
                     <div className="flex items-center gap-2">
-                      {offer.discount && (
+                      {offer.discount ? (
                         <p className="text-sm line-through text-foreground/50">
                           ${offer.price.toFixed(2)}
                         </p>
+                      ) : (
+                        ""
                       )}
                       <p className="text-sm font-semibold text-green-600">
                         ${finalPrice.toFixed(2)}

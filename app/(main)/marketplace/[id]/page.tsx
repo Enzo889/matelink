@@ -78,7 +78,7 @@ async function ProductPage({ params }: ProductPageProps) {
               <span className="text-2xl font-bold text-green-600">
                 ${finalPrice}
               </span>
-              {product.discount && (
+              {product.discount ? (
                 <>
                   <span className="text-lg line-through text-muted-foreground">
                     ${product.price}
@@ -87,6 +87,8 @@ async function ProductPage({ params }: ProductPageProps) {
                     {product.discount}% OFF
                   </span>
                 </>
+              ) : (
+                ""
               )}
             </div>
 
