@@ -2,18 +2,18 @@ export interface OffersInterface {
   id: number;
   href: string;
   name: string;
+  description: string;
   image: string;
   alt: string;
-  stock: string;
   price: number;
-  discount: number | null;
+  category: string;
   installments: string;
   shipping: string;
-  description: string;
-  category: string;
   categoryId: number;
-  condition: "new" | "like-new" | "used";
   seller: string;
+  stock: string;
+  discount: number | null;
+  condition: "new" | "like-new" | "used";
   location: string;
   isOwner: boolean;
 }

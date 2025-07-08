@@ -315,37 +315,46 @@ export type Database = {
       items_for_sale: {
         Row: {
           category_id: number | null
+          condition: string | null
           created_at: string | null
           description: string
+          discount: number | null
           id: number
           is_available: boolean | null
           is_paused: boolean | null
           price: number
           rating: number | null
+          stock: number
           title: string
           user_id: number | null
         }
         Insert: {
           category_id?: number | null
+          condition?: string | null
           created_at?: string | null
           description: string
+          discount?: number | null
           id?: never
           is_available?: boolean | null
           is_paused?: boolean | null
           price: number
           rating?: number | null
+          stock?: number
           title: string
           user_id?: number | null
         }
         Update: {
           category_id?: number | null
+          condition?: string | null
           created_at?: string | null
           description?: string
+          discount?: number | null
           id?: never
           is_available?: boolean | null
           is_paused?: boolean | null
           price?: number
           rating?: number | null
+          stock?: number
           title?: string
           user_id?: number | null
         }

@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -12,10 +12,8 @@ import { Heart, ShoppingCart, MoreHorizontal, Trash2 } from "lucide-react";
 import { Category } from "./data/category-data";
 import { OffersInterface } from "./data/product-data";
 import EditItem from "./edit";
-import { offersApi } from "./api";
+import { products } from "./data/product-data"; // Import hardcoded data
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { Loading } from "@/components/loading";
 
 interface Filters {
   priceRange: [number, number];
@@ -34,39 +32,14 @@ function ItemsMarketplace({
   filters,
   searchTerm,
 }: ItemsMarketplaceProps) {
-  const [offers, setOffers] = useState<OffersInterface[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [offers, setOffers] = useState<OffersInterface[]>(
+Object.values(products) as OffersInterface[]
+  );
 
-  const router = useRouter();
 
-  // Llama a la API al montar el componente
-  useEffect(() => {
-    const fetchOffers = async () => {
-      try {
-        setLoading(true);
-        const response = await offersApi.getAll();
-        setOffers(response); // Ajusta según la estructura de tu API
-      } catch (error) {
-        console.error("Error fetching offers:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchOffers();
-  }, []);
-
-  const deleteOffer = async (id: number) => {
-    try {
-      await offersApi.delete(id);
-      setOffers((prev) => prev.filter((offer) => offer.id !== id)); // Elimina del estado local
-      toast.success("Product deleted successfully!");
-      router.refresh(); // Refresh the page to reflect changes
-      // Optionally, you can refresh the offers list or update state here
-    } catch (error) {
-      console.error("Error deleting product:", error);
-      toast.error("An error occurred while deleting the product.");
-    }
-    return { deleteOffer };
+  const deleteOffer = (id: number) => {
+    setOffers((prev) => prev.filter((offer) => offer.id !== id)); // Elimina del estado local
+    toast.success("Product deleted successfully!");
   };
 
   // Calculate final price based on oldPrice and discount
@@ -101,13 +74,13 @@ function ItemsMarketplace({
     // Location filter (case insensitive partial mWatch)
     const locationMatch =
       filters.location === "" ||
-      offer.location.toLowerCase().includes(filters.location.toLowerCase());
+      offer.location?.toLowerCase().includes(filters.location.toLowerCase());
 
     // Search term filter (search in name and alt)
     const searchMatch =
       searchTerm === "" ||
       offer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      offer.alt.toLowerCase().includes(searchTerm.toLowerCase());
+      offer.description.toLowerCase().includes(searchTerm.toLowerCase());
 
     return (
       categoryMatch &&
@@ -117,10 +90,6 @@ function ItemsMarketplace({
       searchMatch
     );
   });
-
-  if (loading) {
-    return <Loading className="flex-1" />;
-  }
   return (
     <div className="flex flex-col items-start gap-4 p-4 rounded-l w-full">
       {filteredOffers.length === 0 ? (
