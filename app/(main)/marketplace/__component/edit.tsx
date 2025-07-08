@@ -66,7 +66,9 @@ const formSchema = z.object({
 });
 
 function EditItem({ item, onSuccess, onCancel }: EditItemProps) {
-  const [images, setImages] = useState<string[]>(item?.images || []);
+  // Cambio: Ahora guardamos los nombres de archivo en lugar de URLs blob
+  const [imageNames, setImageNames] = useState<string[]>(item?.images || []);
+  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -95,18 +97,40 @@ function EditItem({ item, onSuccess, onCancel }: EditItemProps) {
         description: item.description,
         location: item.location,
       });
-      setImages(item.images || []);
+      setImageNames(item.images || []);
+      // Para imágenes existentes, asumimos que son rutas del servidor
+      setImagePreviewUrls(item.images || []);
     }
   }, [item, form]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      const newImages = Array.from(files).map((file) =>
-        URL.createObjectURL(file)
-      );
-      setImages([...images, ...newImages]);
+      const newFileNames: string[] = [];
+      const newPreviewUrls: string[] = [];
+
+      Array.from(files).forEach((file) => {
+        // Guardamos solo el nombre del archivo con "/"
+        const fileName = `/${file.name}`;
+        newFileNames.push(fileName);
+
+        // Creamos URL para preview
+        const previewUrl = URL.createObjectURL(file);
+        newPreviewUrls.push(previewUrl);
+      });
+
+      setImageNames([...imageNames, ...newFileNames]);
+      setImagePreviewUrls([...imagePreviewUrls, ...newPreviewUrls]);
     }
+  };
+
+  // Función para limpiar URLs de preview cuando se cierre el modal
+  const cleanupPreviewUrls = () => {
+    imagePreviewUrls.forEach((url) => {
+      if (url.startsWith("blob:")) {
+        URL.revokeObjectURL(url);
+      }
+    });
   };
 
   // API Functions
@@ -115,14 +139,15 @@ function EditItem({ item, onSuccess, onCancel }: EditItemProps) {
 
     try {
       const offerData: Partial<OffersInterface> = {
-        name: values.title, // Changed from title to name
+        name: values.title,
         price: parseFloat(values.price),
         discount: values.discount ? parseFloat(values.discount) : 0,
         category: values.category,
         condition: values.condition as "new" | "like-new" | "used",
         description: values.description,
         location: values.location,
-        image: images.length > 0 ? images[0] : "", // Assuming single image for now
+        // Ahora guardamos el nombre del archivo en lugar del blob URL
+        image: imageNames.length > 0 ? imageNames[0] : "",
         categoryId:
           categories.find((cat) => cat.name === values.category)?.id || 1,
       };
@@ -137,8 +162,11 @@ function EditItem({ item, onSuccess, onCancel }: EditItemProps) {
 
       setIsOpen(false);
       form.reset();
-      setImages([]);
+      setImageNames([]);
+      cleanupPreviewUrls();
+      setImagePreviewUrls([]);
       onSuccess?.();
+      window.location.reload();
     } catch (error) {
       console.error("Error submitting offer:", error);
       toast.error(
@@ -152,8 +180,24 @@ function EditItem({ item, onSuccess, onCancel }: EditItemProps) {
   const handleCancel = () => {
     setIsOpen(false);
     form.reset();
-    setImages(item?.images || []);
+    setImageNames(item?.images || []);
+    cleanupPreviewUrls();
+    setImagePreviewUrls(item?.images || []);
     onCancel?.();
+  };
+
+  // Función para remover imagen
+  const removeImage = (index: number) => {
+    const newImageNames = imageNames.filter((_, i) => i !== index);
+    const newPreviewUrls = imagePreviewUrls.filter((_, i) => i !== index);
+
+    // Limpiar URL de preview si es un blob
+    if (imagePreviewUrls[index]?.startsWith("blob:")) {
+      URL.revokeObjectURL(imagePreviewUrls[index]);
+    }
+
+    setImageNames(newImageNames);
+    setImagePreviewUrls(newPreviewUrls);
   };
 
   return (
@@ -198,7 +242,7 @@ function EditItem({ item, onSuccess, onCancel }: EditItemProps) {
                   type="file"
                   accept="image/*"
                   multiple
-                  onChange={handleImageUpload}
+                  onChange={handleImageUpload} // Cambia por la función que prefieras
                   className="hidden"
                   id="image-upload"
                 />
@@ -208,15 +252,28 @@ function EditItem({ item, onSuccess, onCancel }: EditItemProps) {
                 >
                   Upload Images
                 </label>
-                <div className="flex gap-2">
-                  {images.map((img, index) => (
+                <div className="flex gap-2 flex-wrap">
+                  {imagePreviewUrls.map((previewUrl, index) => (
                     <div key={index} className="relative w-20 h-20">
                       <Image
-                        src={img}
+                        src={
+                          previewUrl.startsWith("/") ? previewUrl : previewUrl
+                        }
                         alt={`Preview ${index}`}
                         fill
                         className="object-cover rounded-lg"
                       />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                      >
+                        ×
+                      </button>
+                      {/* Mostrar el nombre del archivo guardado */}
+                      <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 rounded-b-lg truncate">
+                        {imageNames[index]}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -244,7 +301,13 @@ function EditItem({ item, onSuccess, onCancel }: EditItemProps) {
                     <FormItem className="flex-1">
                       <FormLabel>Price</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="0.00" {...field} />
+                        <Input
+                          type="number"
+                          placeholder="00"
+                          min={1}
+                          max={1000}
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -260,8 +323,7 @@ function EditItem({ item, onSuccess, onCancel }: EditItemProps) {
                       <FormControl>
                         <Input
                           type="number"
-                          placeholder="0"
-                          min="0"
+                          placeholder="00"
                           max="100"
                           {...field}
                         />

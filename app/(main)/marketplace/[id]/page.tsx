@@ -4,11 +4,11 @@ import BackButton from "@/components/back-button";
 import { Button } from "@/components/ui/button";
 import { ShoppingCartIcon, HeartIcon, ShareIcon } from "lucide-react";
 import ShoppingCart from "../__component/cart";
-import { products } from "../__component/data/product-data";
+import { offersApi } from "../__component/api";
 
 // Example data - in a real application, this would come from a database
-const getProductData = (id: string) => {
-  return products[id as keyof typeof products] || null;
+const getProductData = async (id: string) => {
+  return await offersApi.getById(id);
 };
 
 const calculatePrice = (oldPrice: number, discount: number | null): number => {
@@ -22,10 +22,9 @@ interface ProductPageProps {
   };
 }
 
-function ProductPage({ params }: ProductPageProps) {
-  const product = getProductData(params.id);
-
-  const finalPrice = calculatePrice(product.price, product.discount);
+async function ProductPage({ params }: ProductPageProps) {
+  const resolvedParams = await params;
+  const product = await getProductData(resolvedParams.id);
 
   if (!product) {
     return (
@@ -38,6 +37,8 @@ function ProductPage({ params }: ProductPageProps) {
       </div>
     );
   }
+
+  const finalPrice = calculatePrice(product.price, product.discount);
 
   return (
     <div className="w-full ">
@@ -56,7 +57,7 @@ function ProductPage({ params }: ProductPageProps) {
           <div className="relative aspect-square w-full max-w-md mx-auto">
             <Image
               src={product.image}
-              alt={product.alt}
+              alt={product.name.toLowerCase()}
               fill
               className="object-cover rounded-lg"
               priority
@@ -77,7 +78,7 @@ function ProductPage({ params }: ProductPageProps) {
               <span className="text-2xl font-bold text-green-600">
                 ${finalPrice}
               </span>
-              {product.discount && (
+              {product.discount ? (
                 <>
                   <span className="text-lg line-through text-muted-foreground">
                     ${product.price}
@@ -86,6 +87,8 @@ function ProductPage({ params }: ProductPageProps) {
                     {product.discount}% OFF
                   </span>
                 </>
+              ) : (
+                ""
               )}
             </div>
 
@@ -120,7 +123,9 @@ function ProductPage({ params }: ProductPageProps) {
           <div className="space-y-4 pt-6 border-t">
             <div>
               <h3 className="font-semibold mb-2">Description</h3>
-              <p className="text-muted-foreground">{product.description}</p>
+              <p className="text-muted-foreground  text-pretty">
+                {product.description}
+              </p>
             </div>
 
             <div className="grid grid-cols-2 gap-4 text-sm">
