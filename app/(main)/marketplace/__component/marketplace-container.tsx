@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ItemsMarketplace from "./items";
 import HeaderMarketplace from "./header";
-import { categories } from "./data/category-data";
+import { useCategories } from "./data/category-data";
+import { CategoryType } from "@/types/tables.type";
 
 function MarketplaceContainer() {
-  const [selectedCategory, setSelectedCategory] = useState(categories[0]);
+  const { categories, loading, error } = useCategories();
+  const [selectedCategory, setSelectedCategory] = useState<CategoryType | null>(null);
   const [filters, setFilters] = useState({
     priceRange: [0, 1000],
     location: "",
@@ -14,7 +16,13 @@ function MarketplaceContainer() {
   });
   const [searchTerm, setSearchTerm] = useState("");
 
-  const handleCategoryChange = (category: { id: number; name: string }) => {
+  useEffect(() => {
+    if (categories.length > 0) {
+      setSelectedCategory(categories[0]);
+    }
+  }, [categories]);
+
+  const handleCategoryChange = (category: CategoryType) => {
     setSelectedCategory(category);
   };
 
@@ -30,9 +38,22 @@ function MarketplaceContainer() {
     setSearchTerm(term);
   };
 
+  if (loading) {
+    return <div className="p-8 text-center">Loading categories...</div>;
+  }
+
+  if (error) {
+    return <div className="p-8 text-center text-red-500">Error: {error.message}</div>;
+  }
+
+  if (!selectedCategory) {
+    return <div className="p-8 text-center">No categories found.</div>;
+  }
+
   return (
     <div>
       <HeaderMarketplace
+        categories={categories}
         selectedCategory={selectedCategory}
         onCategoryChange={handleCategoryChange}
         filters={filters}

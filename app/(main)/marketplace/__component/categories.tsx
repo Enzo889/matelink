@@ -6,16 +6,17 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import React, { useState } from "react";
-import { categories } from "./data/category-data";
 import { ArrowDownIcon } from "lucide-react";
+import { CategoryType } from "@/types/tables.type";
 
 
 interface CategoriesProps {
-  onCategoryChange: (category: { id: number; name: string }) => void;
-  selectedCategory: { id: number; name: string };
+  categories: CategoryType[];
+  onCategoryChange: (category: CategoryType) => void;
+  selectedCategory: CategoryType;
 }
 
-function Categories({ onCategoryChange, selectedCategory }: CategoriesProps) {
+function Categories({ categories, onCategoryChange, selectedCategory }: CategoriesProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (

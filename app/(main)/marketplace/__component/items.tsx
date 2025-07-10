@@ -8,12 +8,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Heart, ShoppingCart, MoreHorizontal, Trash2 } from "lucide-react";
-import { Category } from "./data/category-data";
+import { Heart, ShoppingCart, MoreHorizontal, Trash2 } from "lucide-react";;
 import { OffersInterface } from "./data/product-data";
 import EditItem from "./edit";
 import { products } from "./data/product-data"; // Import hardcoded data
 import { toast } from "sonner";
+import { CategoryType } from "@/types/tables.type";
 
 interface Filters {
   priceRange: [number, number];
@@ -22,7 +22,7 @@ interface Filters {
 }
 
 interface ItemsMarketplaceProps {
-  selectedCategory: Category | null;
+  selectedCategory: CategoryType | null;
   filters: Filters;
   searchTerm: string;
 }

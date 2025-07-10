@@ -6,9 +6,12 @@ import FiltersMarketplace from './filters'
 import SearchMarketplace from './search-marketplace'
 import ShoppingCart from './cart'
 
+import { CategoryType } from '@/types/tables.type';
+
 interface HeaderMarketplaceProps {
-  selectedCategory: { id: number; name: string };
-  onCategoryChange: (category: { id: number; name: string }) => void;
+  categories: CategoryType[];
+  selectedCategory: CategoryType;
+  onCategoryChange: (category: CategoryType) => void;
   filters: {
     priceRange: number[];
     location: string;
@@ -23,7 +26,7 @@ interface HeaderMarketplaceProps {
   onSearchChange: (term: string) => void;
 }
 
-function HeaderMarketplace({ selectedCategory, onCategoryChange, filters, onFiltersChange, searchTerm, onSearchChange }: HeaderMarketplaceProps) {
+function HeaderMarketplace({ categories, selectedCategory, onCategoryChange, filters, onFiltersChange, searchTerm, onSearchChange }: HeaderMarketplaceProps) {
   return (
     <header className='flex flex-col w-full h-fit p-2 border-b-2 gap-5'>
         <span className='flex flex-col gap-1.5  '>
@@ -43,6 +46,7 @@ function HeaderMarketplace({ selectedCategory, onCategoryChange, filters, onFilt
         <div className='flex w-full justify-around'>
          <Sell/>
          <Categories 
+           categories={categories}
            selectedCategory={selectedCategory}
            onCategoryChange={onCategoryChange}
          />

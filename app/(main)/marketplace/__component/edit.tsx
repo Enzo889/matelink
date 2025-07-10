@@ -29,7 +29,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { categories } from "./data/category-data";
+import { useCategories } from "./data/category-data";
 import { ArrowUpFromLineIcon, Edit, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { offersApi } from "./api";
@@ -71,6 +71,8 @@ function EditItem({ item, onSuccess, onCancel }: EditItemProps) {
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+
+  const { categories } = useCategories();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
