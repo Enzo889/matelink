@@ -10,6 +10,9 @@ const nextConfig: NextConfig = {
         port: "",
         pathname: "/a/**",
       },
+      {
+        hostname :"randomuser.me"
+      }
     ],
   },
 };
