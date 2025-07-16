@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   Popover,
   PopoverContent,
@@ -89,10 +90,16 @@ function MessageList() {
       {userList.map((item, index) => (
         <div
           key={index}
-          className="flex items-start gap-3 p-4 hover:bg-muted/50 cursor-pointer border-b border-border/50"
+          className="relative flex items-start gap-3 p-4 hover:bg-muted/50 border-b border-border/50 group"
         >
+          {/* Clickable Link Overlay */}
+          <Link
+            href={`/message/${item.username}`}
+            className="absolute inset-0 z-0"
+          />
+
           {/* Avatar */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 relative z-10">
             <Image
               src={item.profilePicture}
               alt={item.name}
@@ -103,7 +110,7 @@ function MessageList() {
           </div>
 
           {/* Content */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 relative z-10 pointer-events-none">
             <div className="flex items-center gap-2 mb-1">
               <span className="font-semibold text-foreground">{item.name}</span>
               <span className="text-sm text-muted-foreground">
@@ -120,10 +127,10 @@ function MessageList() {
           </div>
 
           {/* Options */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 relative z-20">
             <Popover>
               <PopoverTrigger asChild>
-                <button className="p-1 hover:bg-muted rounded cursor-pointer">
+                <button className="p-1 hover:bg-muted rounded cursor-pointer pointer-events-auto">
                   <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
                 </button>
               </PopoverTrigger>
