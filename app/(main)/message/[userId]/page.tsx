@@ -6,6 +6,7 @@ import BackButton from "@/components/back-button";
 import ChatHeader from "../__components/chat-header";
 import MessageBubble from "../__components/message-bubble";
 import MessageInput from "../__components/message-input";
+import Image from "next/image";
 
 interface Message {
   id: string;
@@ -27,6 +28,7 @@ function ChatPage() {
   const params = useParams();
   const userId = params.userId as string;
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   // Mock current user - replace with actual auth
   const currentUser = {
@@ -37,13 +39,61 @@ function ChatPage() {
     isOnline: true,
   };
 
-  // Mock user data - replace with actual API call
-  const chatUser: User = {
+  // Mock users database - replace with actual API call
+  const usersDatabase = [
+    {
+      id: "johndoe",
+      name: "John Doe",
+      username: "johndoe",
+      avatar: "https://randomuser.me/api/portraits/men/5.jpg",
+      isOnline: true,
+    },
+    {
+      id: "janesmith",
+      name: "Jane Smith",
+      username: "janesmith",
+      avatar: "https://randomuser.me/api/portraits/women/7.jpg",
+      isOnline: false,
+    },
+    {
+      id: "bobjohnson",
+      name: "Bob Johnson",
+      username: "bobjohnson",
+      avatar: "https://randomuser.me/api/portraits/men/2.jpg",
+      isOnline: true,
+    },
+    {
+      id: "enzobustamante",
+      name: "Enzo Bustamante",
+      username: "enzobustamante",
+      avatar: "https://randomuser.me/api/portraits/men/1.jpg",
+      isOnline: true,
+    },
+    {
+      id: "mariasanchez",
+      name: "María Sánchez",
+      username: "mariasanchez",
+      avatar: "https://randomuser.me/api/portraits/women/2.jpg",
+      isOnline: false,
+    },
+    {
+      id: "carlosgomez",
+      name: "Carlos Gómez",
+      username: "carlosgomez",
+      avatar: "https://randomuser.me/api/portraits/men/3.jpg",
+      isOnline: true,
+    },
+  ];
+
+  // Find the user based on the URL parameter
+  const chatUser: User = usersDatabase.find(
+    (user) => user.username === userId
+  ) || {
     id: userId,
-    name: "Enzo Bustamante",
-    username: "enzobustamante",
-    avatar: "https://randomuser.me/api/portraits/men/1.jpg",
-    isOnline: true,
+    name: "Unknown User",
+    username: userId,
+    avatar: "https://randomuser.me/api/portraits/lego/1.jpg",
+    isOnline: false,
   };
 
   // Mock messages - replace with actual API call
@@ -74,11 +124,19 @@ function ChatPage() {
 
   const [newMessage, setNewMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [shouldAutoScroll, setShouldAutoScroll] = useState(false);
 
-  // Auto scroll to bottom when new messages arrive
+  // Auto scroll to bottom only when new messages are sent
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (shouldAutoScroll && messagesContainerRef.current) {
+      const container = messagesContainerRef.current;
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: "smooth",
+      });
+      setShouldAutoScroll(false);
+    }
+  }, [messages, shouldAutoScroll]);
 
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
@@ -93,6 +151,7 @@ function ChatPage() {
 
     setMessages((prev) => [...prev, message]);
     setNewMessage("");
+    setShouldAutoScroll(true); // Trigger auto-scroll for new message
 
     // Simulate typing indicator and response
     setIsTyping(true);
@@ -107,6 +166,7 @@ function ChatPage() {
         type: "text",
       };
       setMessages((prev) => [...prev, response]);
+      setShouldAutoScroll(true); // Trigger auto-scroll for response
     }, 2000);
   };
 
@@ -123,7 +183,10 @@ function ChatPage() {
       </div>
 
       {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto p-4 space-y-4"
+      >
         {messages.map((message) => (
           <MessageBubble
             key={message.id}
@@ -136,9 +199,11 @@ function ChatPage() {
         {/* Typing Indicator */}
         {isTyping && (
           <div className="flex items-center gap-3">
-            <img
+            <Image
               src={chatUser.avatar}
               alt={chatUser.name}
+              width={32}
+              height={32}
               className="w-8 h-8 rounded-full"
             />
             <div className="bg-muted px-4 py-2 rounded-2xl rounded-bl-md">
@@ -156,7 +221,6 @@ function ChatPage() {
             </div>
           </div>
         )}
-
         <div ref={messagesEndRef} />
       </div>
 

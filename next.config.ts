@@ -12,6 +12,9 @@ const nextConfig: NextConfig = {
       },
       {
         hostname :"randomuser.me"
+      }, 
+      {
+        hostname: "picsum.photos"
       }
     ],
   },

@@ -15,6 +15,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import Image from "next/image";
 
 interface User {
   id: string;
@@ -34,9 +35,11 @@ function ChatHeader({ user }: ChatHeaderProps) {
       {/* User Info */}
       <div className="flex items-center gap-3">
         <div className="relative">
-          <img
+          <Image
             src={user.avatar}
             alt={user.name}
+            width={36}
+            height={36}
             className="w-10 h-10 rounded-full object-cover"
           />
           {user.isOnline && (

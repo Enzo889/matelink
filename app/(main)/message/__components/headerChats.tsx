@@ -22,9 +22,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+interface User {
+  email: string;
+  name: string;
+  username: string;
+  avatar: string;
+}
+
 function HeaderChats() {
   const [open, setOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<unknown>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const router = useRouter();
 
   // Mock users data - replace with your actual data source

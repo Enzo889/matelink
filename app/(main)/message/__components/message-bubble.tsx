@@ -2,6 +2,7 @@
 
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
+import Image from "next/image";
 
 interface Message {
   id: string;
@@ -47,10 +48,12 @@ function MessageBubble({ message, isOwn, user }: MessageBubbleProps) {
     <div className={`flex gap-3 ${isOwn ? "flex-row-reverse" : "flex-row"}`}>
       {/* Avatar - only show for other users */}
       {!isOwn && (
-        <img
+        <Image
           src={user.avatar}
           alt={user.name}
-          className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+          width={32}
+          height={32}
+          className="w-8  h-8 rounded-full object-cover flex-shrink-0"
         />
       )}
 
