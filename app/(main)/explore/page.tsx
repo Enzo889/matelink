@@ -70,24 +70,39 @@ function ExplorePage() {
         <div className="space-y-6">
           {/* Navigation Tabs */}
           <Tabs defaultValue="trending" className="w-full">
-            <TabsList className="grid w-full grid-cols-5 mb-6">
-              <TabsTrigger value="trending" className="flex items-center gap-2">
+            <TabsList className="grid w-full grid-cols-5 mb-6 ">
+              <TabsTrigger
+                value="trending"
+                className="flex items-center gap-2 cursor-pointer"
+              >
                 <TrendingUp className="w-4 h-4" />
                 Trending
               </TabsTrigger>
-              <TabsTrigger value="products" className="flex items-center gap-2">
+              <TabsTrigger
+                value="products"
+                className="flex items-center gap-2 cursor-pointer"
+              >
                 <ShoppingBag className="w-4 h-4" />
-                Products
+                Offers
               </TabsTrigger>
-              <TabsTrigger value="jobs" className="flex items-center gap-2">
+              <TabsTrigger
+                value="jobs"
+                className="flex items-center gap-2 cursor-pointer"
+              >
                 <Briefcase className="w-4 h-4" />
                 Jobs
               </TabsTrigger>
-              <TabsTrigger value="news" className="flex items-center gap-2">
+              <TabsTrigger
+                value="news"
+                className="flex items-center gap-2 cursor-pointer"
+              >
                 <Newspaper className="w-4 h-4" />
                 News
               </TabsTrigger>
-              <TabsTrigger value="sports" className="flex items-center gap-2">
+              <TabsTrigger
+                value="sports"
+                className="flex items-center gap-2 cursor-pointer"
+              >
                 <Trophy className="w-4 h-4" />
                 Sports
               </TabsTrigger>

@@ -22,7 +22,7 @@ function TrendingTopics() {
   const trendingTopics = [
     {
       id: 1,
-      hashtag: "#ReactJS",
+      hashtag: "ReactJS",
       posts: "45.2K",
       trend: "+12%",
       trendValue: 12,
@@ -37,7 +37,7 @@ function TrendingTopics() {
     },
     {
       id: 2,
-      hashtag: "#WorldCup2024",
+      hashtag: "WorldCup",
       posts: "128K",
       trend: "+45%",
       trendValue: 45,
@@ -52,7 +52,7 @@ function TrendingTopics() {
     },
     {
       id: 3,
-      hashtag: "#RemoteWork",
+      hashtag: "RemoteWork",
       posts: "32.1K",
       trend: "+8%",
       trendValue: 8,
@@ -67,7 +67,7 @@ function TrendingTopics() {
     },
     {
       id: 4,
-      hashtag: "#AI",
+      hashtag: "AI",
       posts: "89.5K",
       trend: "+23%",
       trendValue: 23,
@@ -82,7 +82,7 @@ function TrendingTopics() {
     },
     {
       id: 5,
-      hashtag: "#Startup",
+      hashtag: "Startup",
       posts: "21.3K",
       trend: "+15%",
       trendValue: 15,
@@ -97,7 +97,7 @@ function TrendingTopics() {
     },
     {
       id: 6,
-      hashtag: "#Climate",
+      hashtag: "Climate",
       posts: "67.8K",
       trend: "+19%",
       trendValue: 19,
@@ -150,7 +150,7 @@ function TrendingTopics() {
             <TrendingUp className="w-5 h-5 text-primary" />
             <Flame className="w-3 h-3 text-orange-500 absolute -top-1 -right-1 animate-pulse" />
           </div>
-          <h2 className="text-xl font-bold">What's Trending</h2>
+          <h2 className="text-xl font-bold">What&apos;s Trending</h2>
         </div>
 
         <div className="flex items-center gap-2">
@@ -200,7 +200,7 @@ function TrendingTopics() {
             )}
 
             <CardHeader className="pt-12 pb-3">
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-0 mb-2">
                 <Hash className="w-5 h-5 text-primary" />
                 <CardTitle className="text-xl group-hover:text-primary transition-colors">
                   {topic.hashtag}
@@ -288,8 +288,8 @@ function TrendingTopics() {
                   </Badge>
                   <div>
                     <div className="flex items-center gap-2">
-                      <Hash className="w-4 h-4 text-primary" />
-                      <span className="font-semibold group-hover:text-primary transition-colors">
+                      <span className="font-semibold group-hover:text-primary transition-colors flex items-center">
+                        <Hash className="w-4 h-4 text-primary" />
                         {topic.hashtag}
                       </span>
                       <Badge

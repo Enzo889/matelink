@@ -11,6 +11,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 interface NewsSectionProps {
   category: "politics" | "sports";
@@ -140,9 +141,11 @@ function NewsSection({ category }: NewsSectionProps) {
           >
             <div className="md:flex">
               <div className="md:w-1/3">
-                <img
+                <Image
                   src={article.image}
                   alt={article.title}
+                  width={300}
+                  height={200}
                   className="w-full h-48 md:h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
               </div>

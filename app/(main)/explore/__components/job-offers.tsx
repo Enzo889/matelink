@@ -11,6 +11,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 function JobOffers() {
   const jobOffers = [
@@ -127,9 +128,11 @@ function JobOffers() {
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3">
-                  <img
+                  <Image
                     src={job.logo}
                     alt={job.company}
+                    width={64}
+                    height={64}
                     className="w-12 h-12 rounded-lg object-cover border"
                   />
                   <div>

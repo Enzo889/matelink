@@ -4,7 +4,6 @@ import {
   ShoppingBag,
   Star,
   MapPin,
-  Clock,
   Heart,
   ShoppingCart,
   TrendingUp,

@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, User, Hash, FileText, Filter } from "lucide-react";
+import { ArrowLeft, User, Hash, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -94,7 +94,9 @@ function SearchResults({ query, onBack }: SearchResultsProps) {
         </Button>
         <div>
           <h2 className="text-xl font-bold">Search Results</h2>
-          <p className="text-sm text-muted-foreground">Results for "{query}"</p>
+          <p className="text-sm text-muted-foreground">
+            Results for &quot;{query}&quot;
+          </p>
         </div>
       </div>
 
