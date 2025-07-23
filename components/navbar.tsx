@@ -20,6 +20,7 @@ import {
   ShieldIcon,
   ShoppingCartIcon,
   UserIcon,
+  WaypointsIcon,
 } from "lucide-react";
 
 import { Button } from "./ui/button";
@@ -45,6 +46,7 @@ const navItems = [
 const popoverItems = [
   { label: "Premium", href: "/premium", icon: CrownIcon },
   { label: "Saved", href: "/saved", icon: BookmarkIcon },
+  { label: "Interest", href: "/interest", icon: WaypointsIcon },
   { label: "Organizations", href: "/organizations", icon: Building2Icon },
   { label: "Ads", href: "/premium", icon: MegaphoneIcon },
   { label: "Settings", href: "/settings", icon: SettingsIcon },

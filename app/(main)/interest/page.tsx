@@ -1,6 +1,8 @@
-export default function InterestPage {
+import React from "react";
+import InterestMain from "./componets/interest-main";
 
-    return <div>
-        interest page
-    </div>
+function InterestPage() {
+  return <InterestMain />; // Renderiza el componente InterestMain
 }
+
+export default InterestPage;
