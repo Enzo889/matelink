@@ -1,177 +1,114 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import BackButton from "@/components/back-button";
 import ChatHeader from "../__components/chat-header";
-import MessageBubble from "../__components/message-bubble";
 import MessageInput from "../__components/message-input";
-import Image from "next/image";
+import { useRealtimeChat } from "@/hooks/use-realtime-chat";
+import { useChatScroll } from "@/hooks/use-chat-scroll";
+import { ChatMessageItem } from "../__components/chat-message";
+import { createClient } from "@/utils/supabase/client";
+import { UserType } from "@/types/tables.type";
 
-interface Message {
-  id: string;
-  content: string;
-  senderId: string;
-  timestamp: Date;
-  type: "text" | "emoji";
-}
-
-interface User {
-  id: string;
-  name: string;
-  username: string;
-  avatar: string;
-  isOnline: boolean;
+function normalizeUsername(username: string) {
+  return username.trim().toLowerCase().replace(/\s+/g, "-");
 }
 
 function ChatPage() {
   const params = useParams();
-  const userId = params.userId as string;
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  // Normaliza el username del destinatario desde la URL
+  const userId = normalizeUsername(params.userId as string);
 
-  // Mock current user - replace with actual auth
-  const currentUser = {
-    id: "current-user",
-    name: "You",
-    username: "you",
-    avatar: "https://randomuser.me/api/portraits/men/10.jpg",
-    isOnline: true,
-  };
-
-  // Mock users database - replace with actual API call
-  const usersDatabase = [
-    {
-      id: "johndoe",
-      name: "John Doe",
-      username: "johndoe",
-      avatar: "https://randomuser.me/api/portraits/men/5.jpg",
-      isOnline: true,
-    },
-    {
-      id: "janesmith",
-      name: "Jane Smith",
-      username: "janesmith",
-      avatar: "https://randomuser.me/api/portraits/women/7.jpg",
-      isOnline: false,
-    },
-    {
-      id: "bobjohnson",
-      name: "Bob Johnson",
-      username: "bobjohnson",
-      avatar: "https://randomuser.me/api/portraits/men/2.jpg",
-      isOnline: true,
-    },
-    {
-      id: "enzobustamante",
-      name: "Enzo Bustamante",
-      username: "enzobustamante",
-      avatar: "https://randomuser.me/api/portraits/men/1.jpg",
-      isOnline: true,
-    },
-    {
-      id: "mariasanchez",
-      name: "María Sánchez",
-      username: "mariasanchez",
-      avatar: "https://randomuser.me/api/portraits/women/2.jpg",
-      isOnline: false,
-    },
-    {
-      id: "carlosgomez",
-      name: "Carlos Gómez",
-      username: "carlosgomez",
-      avatar: "https://randomuser.me/api/portraits/men/3.jpg",
-      isOnline: true,
-    },
-  ];
-
-  // Find the user based on the URL parameter
-  const chatUser: User = usersDatabase.find(
-    (user) => user.username === userId
-  ) || {
-    id: userId,
-    name: "Unknown User",
-    username: userId,
-    avatar: "https://randomuser.me/api/portraits/lego/1.jpg",
-    isOnline: false,
-  };
-
-  // Mock messages - replace with actual API call
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      content:
-        "Hey man, I really love your work! Congratulations on everything, and thank you for always keeping up the great work.",
-      senderId: currentUser.id,
-      timestamp: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
-      type: "text",
-    },
-    {
-      id: "2",
-      content: "Thank you so much! That means a lot to me 😊",
-      senderId: userId,
-      timestamp: new Date(Date.now() - 1000 * 60 * 25), // 25 minutes ago
-      type: "text",
-    },
-    {
-      id: "3",
-      content: "Keep up the amazing work! 🚀",
-      senderId: currentUser.id,
-      timestamp: new Date(Date.now() - 1000 * 60 * 20), // 20 minutes ago
-      type: "text",
-    },
-  ]);
-
+  const [userProfile, setUserProfile] = useState<UserType | null>(null); // usuario autenticado
+  const [loading, setLoading] = useState(true);
   const [newMessage, setNewMessage] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-  const [shouldAutoScroll, setShouldAutoScroll] = useState(false);
 
-  // Auto scroll to bottom only when new messages are sent
+  const supabase = createClient();
+
   useEffect(() => {
-    if (shouldAutoScroll && messagesContainerRef.current) {
-      const container = messagesContainerRef.current;
-      container.scrollTo({
-        top: container.scrollHeight,
-        behavior: "smooth",
-      });
-      setShouldAutoScroll(false);
-    }
-  }, [messages, shouldAutoScroll]);
+    const fetchProfiles = async () => {
+      setLoading(true);
+
+      // 1. Perfil usuario autenticado
+      const { data: authData, error: authError } =
+        await supabase.auth.getUser();
+      if (authError || !authData?.user) {
+        setUserProfile(null);
+        setLoading(false);
+        return;
+      }
+      const { data: profileData } = await supabase
+        .from("users")
+        .select(
+          "id, name, username, email, description, profile_picture, cover_photo, website, residence, birthday, is_company, surname, uuid"
+        )
+        .eq("uuid", authData.user.id)
+        .single<UserType>();
+
+      // Normaliza el username del usuario autenticado
+      if (profileData) {
+        profileData.username = normalizeUsername(profileData.username);
+      }
+      setUserProfile(profileData || null);
+
+      // 2. Perfil usuario destinatario (por username normalizado)
+      const { data: chatUserData } = await supabase
+        .from("users")
+        .select(
+          "id, name, username, email, description, profile_picture, cover_photo, website, residence, birthday, is_company, surname, uuid"
+        )
+        .eq("username", userId)
+        .single<UserType>();
+
+      if (chatUserData) {
+        chatUserData.username = normalizeUsername(chatUserData.username);
+      }
+
+      setLoading(false);
+    };
+
+    fetchProfiles();
+  }, [supabase, userId]);
+
+  // Room name genérico para todos los usuarios
+  const roomName = "chat";
+
+  const { messages, sendMessage } = useRealtimeChat(
+    userProfile
+      ? {
+          roomName,
+          username: userProfile.username,
+        }
+      : {
+          roomName: "",
+          username: "",
+        }
+  );
+
+  const { containerRef, scrollToBottom } = useChatScroll();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Loading...
+      </div>
+    );
+  }
+
+  if (!userProfile) {
+    return (
+      <div className="flex items-center justify-center h-screen text-muted-foreground">
+        User not found or not authenticated.
+      </div>
+    );
+  }
 
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
-
-    const message: Message = {
-      id: Date.now().toString(),
-      content: newMessage,
-      senderId: currentUser.id,
-      timestamp: new Date(),
-      type: "text",
-    };
-
-    setMessages((prev) => [...prev, message]);
+    sendMessage(newMessage);
     setNewMessage("");
-    setShouldAutoScroll(true); // Trigger auto-scroll for new message
-
-    // Simulate typing indicator and response
-    setIsTyping(true);
-    setTimeout(() => {
-      setIsTyping(false);
-      // Simulate a response (remove in production)
-      const response: Message = {
-        id: (Date.now() + 1).toString(),
-        content: "Thanks for your message! 👍",
-        senderId: userId,
-        timestamp: new Date(),
-        type: "text",
-      };
-      setMessages((prev) => [...prev, response]);
-      setShouldAutoScroll(true); // Trigger auto-scroll for response
-    }, 2000);
-  };
-
-  const handleEmojiClick = (emoji: string) => {
-    setNewMessage((prev) => prev + emoji);
+    setTimeout(scrollToBottom, 100);
   };
 
   return (
@@ -179,49 +116,29 @@ function ChatPage() {
       {/* Header */}
       <div className="flex items-center gap-3 p-4 border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <BackButton />
-        <ChatHeader user={chatUser} />
+        <ChatHeader
+          user={{
+            id: userProfile.id.toString(),
+            name: userProfile.name || "Unknown User",
+            username: userProfile.username,
+            avatar: userProfile.profile_picture || "/default-avatar.png",
+            isOnline: false,
+          }}
+        />
       </div>
 
       {/* Messages Container */}
-      <div
-        ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto p-4 space-y-4"
-      >
-        {messages.map((message) => (
-          <MessageBubble
+      <div ref={containerRef} className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.map((message, idx) => (
+          <ChatMessageItem
             key={message.id}
             message={message}
-            isOwn={message.senderId === currentUser.id}
-            user={message.senderId === currentUser.id ? currentUser : chatUser}
+            isOwnMessage={message.user.name === userProfile.username}
+            showHeader={
+              idx === 0 || messages[idx - 1].user.name !== message.user.name
+            }
           />
         ))}
-
-        {/* Typing Indicator */}
-        {isTyping && (
-          <div className="flex items-center gap-3">
-            <Image
-              src={chatUser.avatar}
-              alt={chatUser.name}
-              width={32}
-              height={32}
-              className="w-8 h-8 rounded-full"
-            />
-            <div className="bg-muted px-4 py-2 rounded-2xl rounded-bl-md">
-              <div className="flex space-x-1">
-                <div className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce"></div>
-                <div
-                  className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce"
-                  style={{ animationDelay: "0.1s" }}
-                ></div>
-                <div
-                  className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce"
-                  style={{ animationDelay: "0.2s" }}
-                ></div>
-              </div>
-            </div>
-          </div>
-        )}
-        <div ref={messagesEndRef} />
       </div>
 
       {/* Message Input */}
@@ -230,8 +147,8 @@ function ChatPage() {
           value={newMessage}
           onChange={setNewMessage}
           onSend={handleSendMessage}
-          onEmojiClick={handleEmojiClick}
-          placeholder={`Message ${chatUser.name}...`}
+          onEmojiClick={(emoji) => setNewMessage((prev) => prev + emoji)}
+          placeholder={`Message ${userProfile.name}...`}
         />
       </div>
     </div>
