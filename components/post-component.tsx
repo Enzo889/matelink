@@ -1,42 +1,77 @@
 "use client";
 import { useRef, useState } from "react";
 import { Button } from "./ui/button";
-import {
-  MorphingDialog,
-  MorphingDialogContainer,
-  MorphingDialogContent,
-  MorphingDialogTrigger,
-} from "./ui/morphing-dialog";
+import { Popover, PopoverTrigger, PopoverContent } from "./ui/popover";
 import {
   PromptInput,
   PromptInputAction,
   PromptInputActions,
   PromptInputTextarea,
 } from "./ui/prompt-input";
-import { ArrowUp, Paperclip, Square, X } from "lucide-react";
+import { ArrowUp, Paperclip, Square, X, PlusCircle } from "lucide-react";
 import EmojiInput from "./emoji-input";
 import PostOptions from "./post-options";
 import NumberFlow from "@number-flow/react";
 import { AvatarComponent } from "@/app/(main)/components/avatar";
+import { CreatePetitionModal } from "@/app/(main)/petitions/__componets/create-petition-modal";
+import { Dialog, DialogClose, DialogContent, DialogTitle } from "./ui/dialog";
 
 export const PostDialog = () => {
+  const [showPostFeed, setShowPostFeed] = useState(false);
+  const [showPetitionModal, setShowPetitionModal] = useState(false);
+  const [popoverOpen, setPopoverOpen] = useState(false);
+
   return (
-    <MorphingDialog>
-      <MorphingDialogTrigger>
-        <div
-          className={` bg-primary text-primary-foreground shadow-xs hover:bg-primary/90" cursor-pointer text-xl md:text-2xl font-semibold rounded-4xl mt-1.5 py-3  px-16`}
-        >
-          New Post
-        </div>
-      </MorphingDialogTrigger>
-      <MorphingDialogContainer>
-        <MorphingDialogContent>
-          <div>
-            <PostFeed />
+    <>
+      <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+        <PopoverTrigger asChild>
+          <div
+            className="bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 cursor-pointer text-xl md:text-2xl font-semibold rounded-4xl mt-1.5 py-3 px-16 flex items-center gap-4"
+            onClick={() => setPopoverOpen(true)}
+          >
+            <PlusCircle className="size-6" />
+            New Post
           </div>
-        </MorphingDialogContent>
-      </MorphingDialogContainer>
-    </MorphingDialog>
+        </PopoverTrigger>
+        <PopoverContent className="w-64 flex flex-col gap-4">
+          <Button
+            variant="default"
+            className="w-full cursor-pointer"
+            onClick={() => {
+              setShowPostFeed(true);
+              setPopoverOpen(false);
+            }}
+          >
+            Create Post
+          </Button>
+          <Button
+            variant="outline"
+            className="w-full cursor-pointer"
+            onClick={() => {
+              setShowPetitionModal(true);
+              setPopoverOpen(false);
+            }}
+          >
+            Create Petition
+          </Button>
+        </PopoverContent>
+      </Popover>
+
+      {showPostFeed && (
+        <Dialog open={showPostFeed} onOpenChange={setShowPostFeed}>
+          <DialogContent className="min-w-xl rounded-4xl p-0">
+            <DialogTitle className="hidden"></DialogTitle>
+            <DialogClose className="hidden opacity-0"></DialogClose>
+            <PostFeed />
+          </DialogContent>
+        </Dialog>
+      )}
+
+      <CreatePetitionModal
+        open={showPetitionModal}
+        onOpenChange={setShowPetitionModal}
+      />
+    </>
   );
 };
 

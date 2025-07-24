@@ -19,6 +19,7 @@ import {
   SettingsIcon,
   ShieldIcon,
   ShoppingCartIcon,
+  SmilePlusIcon,
   UserIcon,
   WaypointsIcon,
 } from "lucide-react";
@@ -46,6 +47,7 @@ const navItems = [
 const popoverItems = [
   { label: "Premium", href: "/premium", icon: CrownIcon },
   { label: "Saved", href: "/saved", icon: BookmarkIcon },
+  { label: "Petitions", href: "/petitions", icon: SmilePlusIcon },
   { label: "Interest", href: "/interest", icon: WaypointsIcon },
   { label: "Organizations", href: "/organizations", icon: Building2Icon },
   { label: "Ads", href: "/premium", icon: MegaphoneIcon },
