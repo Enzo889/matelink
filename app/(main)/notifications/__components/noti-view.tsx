@@ -102,76 +102,94 @@ export function NotificationsView() {
 	}
 
 	return (
-		<div className="max-w-2xl mx-auto">
-			<div className="border-b border-border p-4">
-				<div className="flex items-center justify-between">
-					<div>
-						<h2 className="text-xl font-bold">Notifications</h2>
-						<p className="text-muted-foreground">
-							{unreadCount > 0 ? `${unreadCount} unread notifications` : "All notifications read"}
-						</p>
-					</div>
-					{unreadCount > 0 && (
-						<Button variant="outline" size="sm" onClick={markAllAsRead}>
-							Mark all as read
-						</Button>
-					)}
-				</div>
-			</div>
+    <div className="max-w-2xl mx-auto">
+      <div className="border-b border-border p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold">Notifications</h2>
+            <p className="text-muted-foreground">
+              {unreadCount > 0
+                ? `${unreadCount} unread notifications`
+                : "All notifications read"}
+            </p>
+          </div>
+          {unreadCount > 0 && (
+            <Button variant="outline" size="sm" onClick={markAllAsRead}>
+              Mark all as read
+            </Button>
+          )}
+        </div>
+      </div>
 
-			<div className="divide-y divide-border">
-				{notifications.map((notification) => (
-					<Card
-						key={notification.id}
-						className={`border-0 border-b border-border rounded-none hover:bg-[var(--accent)]/20 transition-colors ${
-							!notification.read ? "bg-[var(--accent)]/40" : "bg-[var(--accent)]/10"
-						}`}
-					>
-						<CardContent className="p-4">
-							<div className="flex items-start gap-4">
-								<div className={`p-2 rounded-full ${getNotificationBg(notification.type)}`}>
-									{getNotificationIcon(notification.type)}
-								</div>
+      <div className="flex flex-col space-y-4 p-4 border-none">
+        {notifications.map((notification) => (
+          <Card
+            key={notification.id}
+            className={`border-none rounded-none hover:bg-[var(--accent)]/20 transition-colors ${
+              !notification.read
+                ? "bg-[var(--accent)]/40"
+                : "bg-[var(--accent)]/10"
+            }`}
+          >
+            <CardContent className="p-4">
+              <div className="flex items-start gap-4">
+                <div
+                  className={`p-2 rounded-full ${getNotificationBg(
+                    notification.type
+                  )}`}
+                >
+                  {getNotificationIcon(notification.type)}
+                </div>
 
-								<div className="flex-1 space-y-2">
-									<div className="flex items-start justify-between">
-										<div>
-											<h3 className="font-semibold text-sm">{notification.title}</h3>
-											<p className="text-sm text-muted-foreground leading-relaxed">{notification.message}</p>
-										</div>
-										{!notification.read && <div className="w-2 h-2 bg-[var(--accent-foreground)]/50 rounded-full mt-1 flex-shrink-0" />}
-									</div>
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3 className="font-semibold text-sm">
+                        {notification.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {notification.message}
+                      </p>
+                    </div>
+                    {!notification.read && (
+                      <div className="w-2 h-2 bg-[var(--accent-foreground)]/50 rounded-full mt-1 flex-shrink-0" />
+                    )}
+                  </div>
 
-									<div className="flex items-center justify-between">
-										<p className="text-xs text-muted-foreground">
-											{formatDistanceToNow(new Date(notification.timestamp), {
-												addSuffix: true,
-												locale: enUS,
-											})}
-										</p>
-										<Button
-											variant="outline"
-											size="sm"
-                                            className="cursor-pointer"
-											onClick={() => handleViewDetails(notification.id, notification.id)}
-										>
-											View details
-										</Button>
-									</div>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
-				))}
-			</div>
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-muted-foreground">
+                      {formatDistanceToNow(new Date(notification.timestamp), {
+                        addSuffix: true,
+                        locale: enUS,
+                      })}
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="cursor-pointer"
+                      onClick={() =>
+                        handleViewDetails(notification.id, notification.id)
+                      }
+                    >
+                      View details
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
-			{notifications.length === 0 && (
-				<div className="flex flex-col items-center justify-center py-12 text-center">
-					<Bell className="h-12 w-12 text-muted-foreground mb-4" />
-					<h3 className="text-lg font-semibold mb-2">No notifications</h3>
-					<p className="text-muted-foreground">We will notify you when there are new opportunities or updates.</p>
-				</div>
-			)}
-		</div>
-	)
+      {notifications.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          <Bell className="h-12 w-12 text-muted-foreground mb-4" />
+          <h3 className="text-lg font-semibold mb-2">No notifications</h3>
+          <p className="text-muted-foreground">
+            We will notify you when there are new opportunities or updates.
+          </p>
+        </div>
+      )}
+    </div>
+  );
 }

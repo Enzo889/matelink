@@ -111,7 +111,9 @@ export function ApplicationModal({ open, onOpenChange, petition }: ApplicationMo
           {petition.requirements && (
             <div>
               <p className="font-medium mb-1">Requirements:</p>
-              <p className="text-sm text-muted-foreground">{petition.requirements}</p>
+              <p className="text-sm text-muted-foreground">
+                {petition.requirements}
+              </p>
             </div>
           )}
         </div>
@@ -119,11 +121,18 @@ export function ApplicationModal({ open, onOpenChange, petition }: ApplicationMo
         {/* Rest of the form remains the same */}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="message">Why are you the ideal person for this petition? *</Label>
+            <Label htmlFor="message">
+              Why are you the ideal person for this petition? *
+            </Label>
             <Textarea
               id="message"
               value={applicationData.message}
-              onChange={(e) => setApplicationData((prev) => ({ ...prev, message: e.target.value }))}
+              onChange={(e) =>
+                setApplicationData((prev) => ({
+                  ...prev,
+                  message: e.target.value,
+                }))
+              }
               placeholder="Explain your experience, skills and why you should be chosen for this petition..."
               rows={6}
               required
@@ -136,7 +145,12 @@ export function ApplicationModal({ open, onOpenChange, petition }: ApplicationMo
               <Input
                 id="expectedSalary"
                 value={applicationData.expectedSalary}
-                onChange={(e) => setApplicationData((prev) => ({ ...prev, expectedSalary: e.target.value }))}
+                onChange={(e) =>
+                  setApplicationData((prev) => ({
+                    ...prev,
+                    expectedSalary: e.target.value,
+                  }))
+                }
                 placeholder="E.g.: $800"
               />
             </div>
@@ -146,7 +160,12 @@ export function ApplicationModal({ open, onOpenChange, petition }: ApplicationMo
               <Input
                 id="availability"
                 value={applicationData.availability}
-                onChange={(e) => setApplicationData((prev) => ({ ...prev, availability: e.target.value }))}
+                onChange={(e) =>
+                  setApplicationData((prev) => ({
+                    ...prev,
+                    availability: e.target.value,
+                  }))
+                }
                 placeholder="E.g.: Immediate, In 2 weeks"
               />
             </div>
@@ -157,7 +176,12 @@ export function ApplicationModal({ open, onOpenChange, petition }: ApplicationMo
             <Input
               id="portfolio"
               value={applicationData.portfolio}
-              onChange={(e) => setApplicationData((prev) => ({ ...prev, portfolio: e.target.value }))}
+              onChange={(e) =>
+                setApplicationData((prev) => ({
+                  ...prev,
+                  portfolio: e.target.value,
+                }))
+              }
               placeholder="Links to your portfolio, GitHub, LinkedIn, etc."
             />
           </div>
@@ -187,7 +211,9 @@ export function ApplicationModal({ open, onOpenChange, petition }: ApplicationMo
                     <>
                       <Upload className="h-8 w-8 text-muted-foreground" />
                       <p className="font-medium">Upload Curriculum</p>
-                      <p className="text-sm text-muted-foreground">PDF, DOC or DOCX (max. 10MB)</p>
+                      <p className="text-sm text-muted-foreground">
+                        PDF, DOC or DOCX (max. 10MB)
+                      </p>
                     </>
                   )}
                 </div>
@@ -196,15 +222,19 @@ export function ApplicationModal({ open, onOpenChange, petition }: ApplicationMo
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               Cancel
             </Button>
-            <Button type="submit" className="bg-amber-600 hover:bg-amber-700">
+            <Button type="submit" className="bg-primary hover:bg-primary/80">
               Submit Application
             </Button>
           </div>
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

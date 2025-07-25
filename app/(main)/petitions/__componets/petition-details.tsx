@@ -172,12 +172,16 @@ export function PetitionDetails({ petitionId }: PetitionDetailsProps) {
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-semibold text-lg">{mockPetition.postedBy}</p>
+                    <p className="font-semibold text-lg">
+                      {mockPetition.postedBy}
+                    </p>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                         <span>{mockPetition.userProfile.rating}</span>
-                        <span>({mockPetition.userProfile.reviewsCount} reviews)</span>
+                        <span>
+                          ({mockPetition.userProfile.reviewsCount} reviews)
+                        </span>
                       </div>
                       <span>•</span>
                       <span>{timeAgo}</span>
@@ -188,8 +192,16 @@ export function PetitionDetails({ petitionId }: PetitionDetailsProps) {
                   <Button variant="outline" size="sm">
                     <Share2 className="h-4 w-4" />
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => setIsLiked(!isLiked)}>
-                    <Heart className={`h-4 w-4 ${isLiked ? "fill-red-500 text-red-500" : ""}`} />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsLiked(!isLiked)}
+                  >
+                    <Heart
+                      className={`h-4 w-4 ${
+                        isLiked ? "fill-red-500 text-red-500" : ""
+                      }`}
+                    />
                   </Button>
                   <Button variant="outline" size="sm">
                     <Flag className="h-4 w-4" />
@@ -199,7 +211,11 @@ export function PetitionDetails({ petitionId }: PetitionDetailsProps) {
 
               <div className="flex gap-2 mb-4">
                 <Badge variant="secondary">{mockPetition.category}</Badge>
-                <Badge className={`${getPetitionTypeColor(mockPetition.petitionType)} text-white`}>
+                <Badge
+                  className={`${getPetitionTypeColor(
+                    mockPetition.petitionType
+                  )} text-white`}
+                >
                   {mockPetition.petitionType}
                 </Badge>
               </div>
@@ -234,15 +250,20 @@ export function PetitionDetails({ petitionId }: PetitionDetailsProps) {
             </CardHeader>
             <CardContent>
               <div className="prose prose-sm max-w-none dark:prose-invert">
-                {mockPetition.description.split("\n").map((paragraph, index) => (
-                  <p key={index} className="mb-4 leading-relaxed">
-                    {paragraph.startsWith("**") && paragraph.endsWith("**") ? (
-                      <strong className="text-foreground">{paragraph.slice(2, -2)}</strong>
-                    ) : (
-                      paragraph
-                    )}
-                  </p>
-                ))}
+                {mockPetition.description
+                  .split("\n")
+                  .map((paragraph, index) => (
+                    <p key={index} className="mb-4 leading-relaxed">
+                      {paragraph.startsWith("**") &&
+                      paragraph.endsWith("**") ? (
+                        <strong className="text-foreground">
+                          {paragraph.slice(2, -2)}
+                        </strong>
+                      ) : (
+                        paragraph
+                      )}
+                    </p>
+                  ))}
               </div>
             </CardContent>
           </Card>
@@ -267,7 +288,9 @@ export function PetitionDetails({ petitionId }: PetitionDetailsProps) {
               {mockPetition.requirements && (
                 <div>
                   <h4 className="font-medium mb-2">Requirements:</h4>
-                  <p className="text-muted-foreground">{mockPetition.requirements}</p>
+                  <p className="text-muted-foreground">
+                    {mockPetition.requirements}
+                  </p>
                 </div>
               )}
             </CardContent>
@@ -276,7 +299,9 @@ export function PetitionDetails({ petitionId }: PetitionDetailsProps) {
           {/* Tabs con aplicaciones y comentarios */}
           <Tabs defaultValue="applications" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="applications">Applicants ({mockPetition.applicationsCount})</TabsTrigger>
+              <TabsTrigger value="applications">
+                Applicants ({mockPetition.applicationsCount})
+              </TabsTrigger>
               <TabsTrigger value="comments">Comments</TabsTrigger>
             </TabsList>
 
@@ -293,7 +318,9 @@ export function PetitionDetails({ petitionId }: PetitionDetailsProps) {
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-2">
                           <div>
-                            <p className="font-semibold">{application.applicantName}</p>
+                            <p className="font-semibold">
+                              {application.applicantName}
+                            </p>
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                               <div className="flex items-center gap-1">
                                 <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
@@ -306,7 +333,9 @@ export function PetitionDetails({ petitionId }: PetitionDetailsProps) {
                           </div>
                           <Badge variant="outline">{application.price}</Badge>
                         </div>
-                        <p className="text-sm text-muted-foreground mb-3">{application.message}</p>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          {application.message}
+                        </p>
                         <div className="flex gap-2">
                           <Button size="sm" variant="outline">
                             View Profile
@@ -345,9 +374,15 @@ export function PetitionDetails({ petitionId }: PetitionDetailsProps) {
                 className="w-full bg-amber-600 hover:bg-amber-700 text-white mb-3"
                 size="lg"
               >
-                {mockPetition.petitionType === "Busco Servicio" ? "Offer Service" : "I'm Interested"}
+                {mockPetition.petitionType === "Busco Servicio"
+                  ? "Offer Service"
+                  : "I'm Interested"}
               </Button>
-              <Button variant="outline" className="w-full bg-transparent">
+              <Button
+                variant="outline"
+                className="w-full bg-transparent"
+                onClick={() => router.push(`/message/chat`)}
+              >
                 <MessageCircle className="h-4 w-4 mr-2" />
                 Send Message
               </Button>
@@ -357,29 +392,46 @@ export function PetitionDetails({ petitionId }: PetitionDetailsProps) {
           {/* User profile */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">About {mockPetition.postedBy}</CardTitle>
+              <CardTitle className="text-lg">
+                About {mockPetition.postedBy}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center gap-2 text-sm">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span>Member since {new Date(mockPetition.userProfile.joinedDate).toLocaleDateString("en-US")}</span>
+                <span>
+                  Member since{" "}
+                  {new Date(
+                    mockPetition.userProfile.joinedDate
+                  ).toLocaleDateString("en-US")}
+                </span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Star className="h-4 w-4 text-yellow-400" />
                 <span>
-                  {mockPetition.userProfile.rating} ({mockPetition.userProfile.reviewsCount} reviews)
+                  {mockPetition.userProfile.rating} (
+                  {mockPetition.userProfile.reviewsCount} reviews)
                 </span>
               </div>
               <div className="text-sm">
-                <span className="font-medium">{mockPetition.userProfile.completedPetitions}</span> completed petitions
+                <span className="font-medium">
+                  {mockPetition.userProfile.completedPetitions}
+                </span>{" "}
+                completed petitions
               </div>
               <Separator />
-              <p className="text-sm text-muted-foreground">{mockPetition.userProfile.bio}</p>
+              <p className="text-sm text-muted-foreground">
+                {mockPetition.userProfile.bio}
+              </p>
               <div>
                 <p className="text-sm font-medium mb-2">Interests:</p>
                 <div className="flex flex-wrap gap-1">
                   {mockPetition.userProfile.interests.map((interest) => (
-                    <Badge key={interest} variant="secondary" className="text-xs">
+                    <Badge
+                      key={interest}
+                      variant="secondary"
+                      className="text-xs"
+                    >
                       {interest}
                     </Badge>
                   ))}
@@ -395,13 +447,18 @@ export function PetitionDetails({ petitionId }: PetitionDetailsProps) {
             </CardHeader>
             <CardContent className="space-y-3">
               {mockPetition.similarPetitions.map((similar) => (
-                <div key={similar.id} className="border rounded-lg p-3 hover:bg-accent/50 cursor-pointer">
+                <div
+                  key={similar.id}
+                  className="border rounded-lg p-3 hover:bg-accent/50 cursor-pointer"
+                >
                   <h4 className="font-medium text-sm mb-1">{similar.title}</h4>
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>{similar.category}</span>
                     <span>{similar.budget}</span>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">{similar.applicationsCount} interested</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {similar.applicationsCount} interested
+                  </p>
                 </div>
               ))}
             </CardContent>
@@ -416,5 +473,5 @@ export function PetitionDetails({ petitionId }: PetitionDetailsProps) {
         petition={mockPetition}
       />
     </div>
-  )
+  );
 }
