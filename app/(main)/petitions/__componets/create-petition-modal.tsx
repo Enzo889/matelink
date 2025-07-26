@@ -34,22 +34,37 @@ interface Interest {
   name: string;
 }
 
-const categories = [
-  "Education",
-  "Languages",
-  "Technology",
-  "Design",
-  "Music",
-  "Sports",
-  "Cooking",
-  "Repairs",
-  "Cleaning",
-  "Personal Care",
-  "Transport",
-  "Events",
-  "Consulting",
-  "Others",
-];
+export interface Petition {
+  id: number;
+  user_uuid: string | null;
+  title: string | null;
+  description: string | null;
+  category: number | null; // Ahora es un número (ID del interés)
+  petition_type: string | null;
+  budget: string | null;
+  location: string | null;
+  requirements: string | null;
+  duration: string | null;
+  participants: string | null;
+  created_at: string | null;
+}
+export interface Notification {
+  id: number; // bigint → number
+  user_id: number | null; // bigint → number | null
+  message: string; // text → string
+  is_read: boolean | null; // boolean → boolean | null
+  created_at: string | null; // timestamp → string ISO
+  noti_uuid: string | null; // uuid → string | null
+  type: string | null; // text → string | null
+  title: string | null; // text → string | null
+  petition_id: number | null; // integer → number | null
+}
+
+export interface PetitionTag {
+  id: number; // serial → number
+  petition_id: number | null; // integer → number | null
+  tag: string | null; // text → string | null
+}
 
 const petitionTypes = [
   "Looking for Service",
@@ -66,7 +81,7 @@ export function CreatePetitionModal({
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    category: "",
+    category: null as Interest | null,
     petitionType: "",
     budget: "",
     location: "",
@@ -112,33 +127,152 @@ export function CreatePetitionModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log("Petition created:", formData);
+    if (!formData.category || !formData.title || !formData.description) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
 
-    toast(
-      <>
-        <strong>Petition created successfully!</strong>
-        <div>
-          Your petition has been published and users with similar interests will
-          be notified.
-        </div>
-      </>
-    );
+    try {
+      // Get current user
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+      if (userError || !user) {
+        toast.error("You must be logged in to create a petition");
+        return;
+      }
 
-    // Reset form
-    setFormData({
-      title: "",
-      description: "",
-      category: "",
-      petitionType: "",
-      budget: "",
-      location: "",
-      requirements: "",
-      interests: [],
-      duration: "",
-      participants: "",
-    });
+      // Insert petition
+      const { data: petitionData, error: petitionError } = await supabase
+        .from("petitions")
+        .insert([
+          {
+            user_uuid: user.id,
+            title: formData.title,
+            description: formData.description,
+            category: formData.category.id, // Guardar el ID del interés, no el nombre
+            petition_type: formData.petitionType,
+            budget: formData.budget || null,
+            location: formData.location || null,
+            requirements: formData.requirements || null,
+            duration: formData.duration || null,
+            participants: formData.participants || null,
+          },
+        ])
+        .select()
+        .single();
 
-    onOpenChange(false);
+      if (petitionError || !petitionData) {
+        console.error("Error creating petition:", petitionError);
+        toast.error("Failed to create petition");
+        return;
+      }
+
+      // Insert petition tags (interests)
+      if (formData.interests.length > 0) {
+        const petitionTags = formData.interests.map((interest) => ({
+          petition_id: petitionData.id,
+          tag: interest.name,
+        }));
+
+        const { error: tagsError } = await supabase
+          .from("petition_tags")
+          .insert(petitionTags);
+
+        if (tagsError) {
+          console.error("Error adding petition tags:", tagsError);
+        }
+      }
+
+      // Find users with the same category interest and send notifications
+      console.log("Looking for users with interest_id:", formData.category?.id);
+
+      const { data: usersWithInterest, error: usersError } = await supabase
+        .from("user_interests")
+        .select(
+          `
+          user_id,
+          users!user_interests_user_id_fkey(uuid)
+        `
+        )
+        .eq("interest_id", formData.category.id);
+
+      console.log("Users with interest query result:", {
+        usersWithInterest,
+        usersError,
+      });
+
+      if (usersError) {
+        console.error("Error finding users with interest:", usersError);
+      } else if (usersWithInterest && usersWithInterest.length > 0) {
+        // Filter out the petition creator
+        const filteredUsers = usersWithInterest.filter(
+          (userInterest: any) => userInterest.users?.uuid !== user.id
+        );
+
+        console.log("Filtered users (excluding creator):", filteredUsers);
+
+        if (filteredUsers.length > 0) {
+          // Create notifications for users with matching interests (excluding creator)
+          const notifications = filteredUsers.map((userInterest: unknown) => ({
+            user_id: userInterest.user_id,
+            title: "New Petition in Your Interest Area",
+            message: `A new petition "${formData.title}" has been created in ${
+              formData.category?.name || "Unknown Category"
+            }`,
+            type: "job_match",
+            petition_id: petitionData.id,
+            is_read: false,
+          }));
+
+          console.log("Notifications to be created:", notifications);
+
+          const { error: notificationError } = await supabase
+            .from("notifications")
+            .insert(notifications);
+
+          if (notificationError) {
+            console.error("Error creating notifications:", notificationError);
+          } else {
+            console.log("Notifications created successfully!");
+          }
+        } else {
+          console.log("No users to notify (excluding creator)");
+        }
+      } else {
+        console.log("No users found with this interest");
+      }
+
+      toast.success(
+        <>
+          <strong>Petition created successfully!</strong>
+          <div>
+            Your petition has been published and users with similar interests
+            will be notified.
+          </div>
+        </>
+      );
+
+      // Reset form
+      setFormData({
+        title: "",
+        description: "",
+        category: null,
+        petitionType: "",
+        budget: "",
+        location: "",
+        requirements: "",
+        interests: [],
+        duration: "",
+        participants: "",
+      });
+
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      toast.error("An unexpected error occurred");
+    }
   };
 
   return (
@@ -166,18 +300,27 @@ export function CreatePetitionModal({
             <div className="space-y-2">
               <Label htmlFor="category">Category *</Label>
               <Select
-                value={formData.category}
-                onValueChange={(value) =>
-                  setFormData((prev) => ({ ...prev, category: value }))
-                }
+                value={formData.category?.id.toString() || ""}
+                onValueChange={(value) => {
+                  const selectedCategory = availableInterests.find(
+                    (interest) => interest.id.toString() === value
+                  );
+                  setFormData((prev) => ({
+                    ...prev,
+                    category: selectedCategory || null,
+                  }));
+                }}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {category}
+                  {availableInterests.map((interest) => (
+                    <SelectItem
+                      key={interest.id}
+                      value={interest.id.toString()}
+                    >
+                      {interest.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
