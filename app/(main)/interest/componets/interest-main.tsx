@@ -5,62 +5,219 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Lock, Plus, Unlock, X } from "lucide-react";
 import React, { useState, useEffect } from "react";
-import { getCategories } from "../api/api"; // Ajusta la ruta si es necesario
+import { createClient } from "@/utils/supabase/client";
 
-interface Category {
-  idCategory: number;
+interface Interest {
+  id: number;
   name: string;
-  idUserCreate: number;
-  idUserUpdate: number;
-  dateCreate: string | null;
-  dateUpdate: string | null;
+  locked?: boolean;
+}
+
+interface UserInterestData {
+  interest_id: number;
+  interests: {
+    id: number;
+    name: string;
+  };
 }
 
 function InterestMain() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedInterests, setSelectedInterests] = useState<
-    Array<{ id: number; name: string; locked: boolean }>
-  >([]);
+  const supabase = createClient();
+  const [popularInterests, setPopularInterests] = useState<Interest[]>([]);
+  const [selectedInterests, setSelectedInterests] = useState<Interest[]>([]);
   const [newInterest, setNewInterest] = useState("");
+  const [userId, setUserId] = useState<number | null>(null);
 
+  // Obtener usuario actual
   useEffect(() => {
-    getCategories().then(setCategories).catch(console.error);
-  }, []);
+    const getUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-  const addCustomInterest = () => {
-    if (newInterest.trim() !== "") {
-      const newId = Date.now();
-      setSelectedInterests([
-        ...selectedInterests,
-        { id: newId, name: newInterest, locked: false },
-      ]);
-      setNewInterest("");
-    }
-  };
+      console.log("Auth user:", user);
 
-  const addInterest = (category: Category) => {
+      if (user) {
+        // Obtener el user_id numérico de la tabla users
+        const { data: userData, error: userError } = await supabase
+          .from("users")
+          .select("id")
+          .eq("uuid", user.id)
+          .single();
+
+        console.log("User data from users table:", { userData, userError });
+        setUserId(userData?.id ?? null);
+      }
+    };
+    getUser();
+  }, [supabase]);
+
+  // Obtener todos los intereses disponibles
+  useEffect(() => {
+    const fetchInterests = async () => {
+      const { data } = await supabase.from("interests").select("id, name");
+
+      setPopularInterests(data ?? []);
+    };
+    fetchInterests();
+  }, [supabase]);
+
+  // Obtener intereses del usuario
+  useEffect(() => {
+    if (!userId) return;
+
+    const fetchUserInterests = async () => {
+      const { data, error } = await supabase
+        .from("user_interests")
+        .select(
+          `
+          interest_id,
+          interests (id, name)
+        `
+        )
+        .eq("user_id", userId);
+
+      console.log("Fetching user interests for userId:", userId);
+      console.log("User interests data:", data);
+      console.log("User interests error:", error);
+
+      if (data) {
+        const userInterests = data.map((item: UserInterestData) => ({
+          id: item.interests.id,
+          name: item.interests.name,
+          locked: false,
+        }));
+        setSelectedInterests(userInterests);
+      }
+    };
+
+    fetchUserInterests();
+  }, [userId, supabase]);
+
+  // Agregar interés personalizado
+  const addCustomInterest = async () => {
+    if (newInterest.trim() === "" || !userId) return;
+
+    // Evitar duplicados
     if (
-      !selectedInterests.some((interest) => interest.name === category.name)
-    ) {
-      setSelectedInterests([
-        ...selectedInterests,
-        { id: category.idCategory, name: category.name, locked: false },
-      ]);
+      selectedInterests.some(
+        (i) => i.name.toLowerCase() === newInterest.trim().toLowerCase()
+      )
+    )
+      return;
+
+    try {
+      // Primero crear el interés si no existe
+      const { data: existingInterest } = await supabase
+        .from("interests")
+        .select("id, name")
+        .ilike("name", newInterest.trim())
+        .single();
+
+      let interestId;
+
+      if (existingInterest) {
+        interestId = existingInterest.id;
+      } else {
+        // Crear nuevo interés
+        const { data: newInterestData, error: interestError } = await supabase
+          .from("interests")
+          .insert([{ name: newInterest.trim() }])
+          .select()
+          .single();
+
+        if (interestError || !newInterestData) return;
+        interestId = newInterestData.id;
+      }
+
+      // Agregar relación usuario-interés
+      const { error: relationError } = await supabase
+        .from("user_interests")
+        .insert([{ user_id: userId, interest_id: interestId }]);
+
+      if (!relationError) {
+        setSelectedInterests([
+          ...selectedInterests,
+          {
+            id: interestId,
+            name: newInterest.trim(),
+            locked: false,
+          },
+        ]);
+        setNewInterest("");
+      }
+    } catch (error) {
+      console.error("Error adding custom interest:", error);
     }
   };
 
-  const removeInterest = (id: number) => {
-    setSelectedInterests(
-      selectedInterests.filter((interest) => interest.id !== id)
-    );
+  // Agregar interés popular
+  const addInterest = async (interest: Interest) => {
+    if (!userId) return;
+    if (selectedInterests.some((i) => i.id === interest.id)) return;
+
+    try {
+      const { error } = await supabase
+        .from("user_interests")
+        .insert([{ user_id: userId, interest_id: interest.id }]);
+
+      if (!error) {
+        setSelectedInterests([
+          ...selectedInterests,
+          { ...interest, locked: false },
+        ]);
+      }
+    } catch (error) {
+      console.error("Error adding interest:", error);
+    }
   };
 
+  // Eliminar interés
+  const removeInterest = async (interestId: number) => {
+    console.log("Attempting to remove interest:", { interestId, userId });
+
+    if (!userId) {
+      console.log("No userId found, cannot remove interest");
+      return;
+    }
+
+    try {
+      // Primero verificar si la relación existe
+      const { data: existingRelation, error: checkError } = await supabase
+        .from("user_interests")
+        .select("*")
+        .eq("user_id", userId)
+        .eq("interest_id", interestId);
+
+      console.log("Existing relation check:", { existingRelation, checkError });
+
+      const { data, error } = await supabase
+        .from("user_interests")
+        .delete()
+        .eq("user_id", userId)
+        .eq("interest_id", interestId)
+        .select(); // Agregar select para ver qué se eliminó
+
+      console.log("Delete result:", { data, error });
+
+      if (!error) {
+        setSelectedInterests(
+          selectedInterests.filter((i) => i.id !== interestId)
+        );
+        console.log("Interest removed from state");
+      } else {
+        console.error("Delete error:", error);
+      }
+    } catch (error) {
+      console.error("Error removing interest:", error);
+    }
+  };
+
+  // Bloquear/desbloquear (solo local)
   const toggleLock = (id: number) => {
     setSelectedInterests(
-      selectedInterests.map((interest) =>
-        interest.id === id
-          ? { ...interest, locked: !interest.locked }
-          : interest
+      selectedInterests.map((i) =>
+        i.id === id ? { ...i, locked: !i.locked } : i
       )
     );
   };
@@ -127,20 +284,18 @@ function InterestMain() {
       <div>
         <h2 className="text-xl font-semibold mb-4">Popular categories</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {categories
+          {popularInterests
             .filter(
-              (category) =>
-                !selectedInterests.some(
-                  (interest) => interest.name === category.name
-                )
+              (interest) =>
+                !selectedInterests.some((sel) => sel.name === interest.name)
             )
-            .map((category) => (
+            .map((interest) => (
               <div
-                key={category.idCategory}
+                key={interest.id}
                 className="p-4 bg-card rounded-lg cursor-pointer hover:bg-secondary transition-colors"
-                onClick={() => addInterest(category)}
+                onClick={() => addInterest(interest)}
               >
-                <h3 className="font-medium text-foreground">{category.name}</h3>
+                <h3 className="font-medium text-foreground">{interest.name}</h3>
                 <p className="text-xs text-muted-foreground">
                   Click to add this category to your interests
                 </p>

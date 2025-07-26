@@ -1,20 +1,37 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { X, DollarSign, MapPin, Clock, Users } from "lucide-react"
-import { toast } from "sonner"
+import type React from "react";
+import { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { X, DollarSign, MapPin, Clock, Users } from "lucide-react";
+import { toast } from "sonner";
+import { createClient } from "@/utils/supabase/client";
 
 interface CreatePetitionModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+interface Interest {
+  id: number;
+  name: string;
 }
 
 const categories = [
@@ -32,11 +49,20 @@ const categories = [
   "Events",
   "Consulting",
   "Others",
-]
+];
 
-const petitionTypes = ["Looking for Service", "Offering Service", "Exchange", "Collaboration"]
+const petitionTypes = [
+  "Looking for Service",
+  "Offering Service",
+  "Exchange",
+  "Collaboration",
+];
 
-export function CreatePetitionModal({ open, onOpenChange }: CreatePetitionModalProps) {
+export function CreatePetitionModal({
+  open,
+  onOpenChange,
+}: CreatePetitionModalProps) {
+  const supabase = createClient();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -45,40 +71,58 @@ export function CreatePetitionModal({ open, onOpenChange }: CreatePetitionModalP
     budget: "",
     location: "",
     requirements: "",
-    tags: [] as string[],
+    interests: [] as Interest[],
     duration: "",
     participants: "",
-  })
-  const [currentTag, setCurrentTag] = useState("")
+  });
+  const [availableInterests, setAvailableInterests] = useState<Interest[]>([]);
+  const [selectedInterestId, setSelectedInterestId] = useState("");
 
-  const handleAddTag = () => {
-    if (currentTag.trim() && !formData.tags.includes(currentTag.trim())) {
+  // Fetch interests from Supabase
+  useEffect(() => {
+    const fetchInterests = async () => {
+      const { data } = await supabase.from("interests").select("id, name");
+      setAvailableInterests(data ?? []);
+    };
+    fetchInterests();
+  }, [supabase]);
+
+  const handleAddInterest = () => {
+    if (!selectedInterestId) return;
+
+    const interest = availableInterests.find(
+      (i) => i.id.toString() === selectedInterestId
+    );
+    if (interest && !formData.interests.some((i) => i.id === interest.id)) {
       setFormData((prev) => ({
         ...prev,
-        tags: [...prev.tags, currentTag.trim()],
-      }))
-      setCurrentTag("")
+        interests: [...prev.interests, interest],
+      }));
+      setSelectedInterestId("");
     }
-  }
+  };
 
-  const handleRemoveTag = (tag: string) => {
+  const handleRemoveInterest = (interestId: number) => {
     setFormData((prev) => ({
       ...prev,
-      tags: prev.tags.filter((t) => t !== tag),
-    }))
-  }
+      interests: prev.interests.filter((i) => i.id !== interestId),
+    }));
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-    console.log("Petition created:", formData)
+    console.log("Petition created:", formData);
 
     toast(
       <>
         <strong>Petition created successfully!</strong>
-        <div>Your petition has been published and users with similar interests will be notified.</div>
+        <div>
+          Your petition has been published and users with similar interests will
+          be notified.
+        </div>
       </>
-    )
+    );
 
     // Reset form
     setFormData({
@@ -89,13 +133,13 @@ export function CreatePetitionModal({ open, onOpenChange }: CreatePetitionModalP
       budget: "",
       location: "",
       requirements: "",
-      tags: [],
+      interests: [],
       duration: "",
       participants: "",
-    })
+    });
 
-    onOpenChange(false)
-  }
+    onOpenChange(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -110,7 +154,9 @@ export function CreatePetitionModal({ open, onOpenChange }: CreatePetitionModalP
             <Input
               id="title"
               value={formData.title}
-              onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, title: e.target.value }))
+              }
               placeholder="E.g.: Looking for beginner English teacher"
               required
             />
@@ -121,7 +167,9 @@ export function CreatePetitionModal({ open, onOpenChange }: CreatePetitionModalP
               <Label htmlFor="category">Category *</Label>
               <Select
                 value={formData.category}
-                onValueChange={(value) => setFormData((prev) => ({ ...prev, category: value }))}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, category: value }))
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select category" />
@@ -140,7 +188,9 @@ export function CreatePetitionModal({ open, onOpenChange }: CreatePetitionModalP
               <Label htmlFor="petitionType">Petition Type *</Label>
               <Select
                 value={formData.petitionType}
-                onValueChange={(value) => setFormData((prev) => ({ ...prev, petitionType: value }))}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, petitionType: value }))
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select type" />
@@ -161,7 +211,12 @@ export function CreatePetitionModal({ open, onOpenChange }: CreatePetitionModalP
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
               placeholder="Describe in detail what you need or offer..."
               rows={4}
               required
@@ -177,7 +232,9 @@ export function CreatePetitionModal({ open, onOpenChange }: CreatePetitionModalP
               <Input
                 id="budget"
                 value={formData.budget}
-                onChange={(e) => setFormData((prev) => ({ ...prev, budget: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, budget: e.target.value }))
+                }
                 placeholder="E.g.: $20/hour, $500 total, Free"
               />
             </div>
@@ -190,7 +247,9 @@ export function CreatePetitionModal({ open, onOpenChange }: CreatePetitionModalP
               <Input
                 id="location"
                 value={formData.location}
-                onChange={(e) => setFormData((prev) => ({ ...prev, location: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, location: e.target.value }))
+                }
                 placeholder="E.g.: Online, New York, My house"
               />
             </div>
@@ -205,7 +264,9 @@ export function CreatePetitionModal({ open, onOpenChange }: CreatePetitionModalP
               <Input
                 id="duration"
                 value={formData.duration}
-                onChange={(e) => setFormData((prev) => ({ ...prev, duration: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, duration: e.target.value }))
+                }
                 placeholder="E.g.: 1 hour, 3 months, Permanent"
               />
             </div>
@@ -218,56 +279,104 @@ export function CreatePetitionModal({ open, onOpenChange }: CreatePetitionModalP
               <Input
                 id="participants"
                 value={formData.participants}
-                onChange={(e) => setFormData((prev) => ({ ...prev, participants: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    participants: e.target.value,
+                  }))
+                }
                 placeholder="E.g.: 1 person, Group of 5, Unlimited"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="requirements">Requirements/Additional Details</Label>
+            <Label htmlFor="requirements">
+              Requirements/Additional Details
+            </Label>
             <Textarea
               id="requirements"
               value={formData.requirements}
-              onChange={(e) => setFormData((prev) => ({ ...prev, requirements: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  requirements: e.target.value,
+                }))
+              }
               placeholder="Mention any specific requirement, necessary experience, materials, etc..."
               rows={3}
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Tags</Label>
+            <Label>Interests</Label>
             <div className="flex gap-2">
-              <Input
-                value={currentTag}
-                onChange={(e) => setCurrentTag(e.target.value)}
-                placeholder="Add tag"
-                onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), handleAddTag())}
-              />
-              <Button type="button" onClick={handleAddTag} variant="outline">
+              <Select
+                value={selectedInterestId}
+                onValueChange={setSelectedInterestId}
+              >
+                <SelectTrigger className="flex-1">
+                  <SelectValue placeholder="Select an interest" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableInterests
+                    .filter(
+                      (interest) =>
+                        !formData.interests.some((i) => i.id === interest.id)
+                    )
+                    .map((interest) => (
+                      <SelectItem
+                        key={interest.id}
+                        value={interest.id.toString()}
+                      >
+                        {interest.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+              <Button
+                type="button"
+                onClick={handleAddInterest}
+                variant="outline"
+              >
                 Add
               </Button>
             </div>
             <div className="flex flex-wrap gap-2 mt-2">
-              {formData.tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="flex items-center gap-1">
-                  {tag}
-                  <X className="h-3 w-3 cursor-pointer" onClick={() => handleRemoveTag(tag)} />
+              {formData.interests.map((interest) => (
+                <Badge
+                  key={interest.id}
+                  variant="secondary"
+                  className="flex items-center gap-1"
+                >
+                  {interest.name}
+                  <X
+                    className="h-3 w-3 cursor-pointer"
+                    onClick={() => handleRemoveInterest(interest.id)}
+                  />
                 </Badge>
               ))}
             </div>
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               Cancel
             </Button>
-            <Button type="submit" className="bg-amber-600 hover:bg-amber-700">
+            <Button
+              type="submit"
+              className="bg-primary hover:bg-primary/80"
+              onClick={handleSubmit}
+            >
               Publish Petition
             </Button>
           </div>
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
