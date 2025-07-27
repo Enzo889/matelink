@@ -316,7 +316,7 @@ export function NotificationsView() {
         router.push(`/petitions/${notification.petition_id}`);
       } else {
         // For other types, navigate to a general page or stay on notifications
-        router.push(`/petitions`);
+        router.push(`/petitions/${notification.petition_id}`);
       }
     } catch (error) {
       console.error("Error in handleViewDetails:", error);

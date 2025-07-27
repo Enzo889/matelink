@@ -1,77 +1,242 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Upload, FileText, DollarSign, MapPin, Clock, Users } from "lucide-react"
-import { toast } from "sonner"
+import type React from "react";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Upload,
+  FileText,
+  DollarSign,
+  MapPin,
+  Clock,
+  Users,
+} from "lucide-react";
+import { toast } from "sonner";
+import { createClient } from "@/utils/supabase/client";
 
 interface ApplicationModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   petition: {
-    id: string
-    title: string
-    description: string
-    category: string
-    petitionType: string
-    budget: string
-    location: string
-    tags: string[]
-    duration: string
-    participants: string
-    postedBy: string
-    requirements: string
-  }
+    id: string;
+    title: string;
+    description: string;
+    category: string;
+    petitionType: string;
+    budget: string;
+    location: string;
+    tags: string[];
+    duration: string;
+    participants: string;
+    postedBy: string;
+    requirements: string;
+  };
 }
 
-export function ApplicationModal({ open, onOpenChange, petition }: ApplicationModalProps) {
+export function ApplicationModal({
+  open,
+  onOpenChange,
+  petition,
+}: ApplicationModalProps) {
   const [applicationData, setApplicationData] = useState({
     message: "",
     expectedSalary: "",
     availability: "",
     portfolio: "",
     cv: null as File | null,
-  })
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const supabase = createClient();
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      setApplicationData((prev) => ({ ...prev, cv: file }))
+      // Check file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error("File size must be less than 10MB");
+        return;
+      }
+      setApplicationData((prev) => ({ ...prev, cv: file }));
     }
-  }
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const uploadFile = async (
+    file: File,
+    userId: string,
+    petitionId: string
+  ): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${userId}_${petitionId}_${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`; // Simplified path without subfolder
 
-    console.log("Application submitted:", {
-      petitionId: petition.id,
-      ...applicationData,
-    })
+      const { data, error: uploadError } = await supabase.storage
+        .from("applications")
+        .upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: false,
+        });
 
-    toast(
-      <>
-        <strong>Application submitted!</strong>
-        <div>Your application for &quot;{petition.title}&quot; has been sent successfully.</div>
-      </>
-    )
+      if (uploadError) {
+        console.error("Error uploading file:", uploadError);
+        toast.error(`File upload failed: ${uploadError.message}`);
+        return null;
+      }
 
-    // Reset form and close modal
-    setApplicationData({
-      message: "",
-      expectedSalary: "",
-      availability: "",
-      portfolio: "",
-      cv: null,
-    })
+      return data.path;
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      toast.error("Unexpected error during file upload");
+      return null;
+    }
+  };
 
-    onOpenChange(false)
-  }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      // Get current user
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+      if (userError || !user) {
+        toast.error("You must be logged in to apply");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Check if user has already applied to this petition
+      const { data: existingApplication } = await supabase
+        .from("applications")
+        .select("id")
+        .eq("petition_id", Number(petition.id))
+        .eq("applicant_uuid", user.id)
+        .single();
+
+      if (existingApplication) {
+        toast.error("You have already applied to this petition");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Upload CV file if provided
+      let cvPath: string | null = null;
+      if (applicationData.cv) {
+        try {
+          cvPath = await uploadFile(applicationData.cv, user.id, petition.id);
+          if (!cvPath) {
+            // If file upload fails, continue without CV but warn user
+            toast.error(
+              "CV upload failed, but your application will be submitted without it."
+            );
+          }
+        } catch (error) {
+          console.error("File upload error:", error);
+          toast.error(
+            "CV upload failed, but your application will be submitted without it."
+          );
+        }
+      }
+
+      // Insert application into database
+      const { error: applicationError } = await supabase
+        .from("applications")
+        .insert([
+          {
+            petition_id: Number(petition.id),
+            applicant_uuid: user.id,
+            message: applicationData.message,
+            expected_salary: applicationData.expectedSalary || null,
+            availability: applicationData.availability || null,
+            portfolio: applicationData.portfolio || null,
+            cv_url: cvPath,
+            status: "pending",
+          },
+        ]);
+
+      if (applicationError) {
+        console.error("Error creating application:", applicationError);
+        toast.error("Failed to submit application. Please try again.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Get petition owner's UUID for notification
+      const { data: petitionOwner } = await supabase
+        .from("petitions")
+        .select("user_uuid")
+        .eq("id", Number(petition.id))
+        .single();
+
+      // Create notification for petition owner
+      if (petitionOwner?.user_uuid) {
+        // Get the user's numeric ID from the users table
+        const { data: ownerData } = await supabase
+          .from("users")
+          .select("id")
+          .eq("uuid", petitionOwner.user_uuid)
+          .single();
+
+        if (ownerData?.id) {
+          const { error: notificationError } = await supabase
+            .from("notifications")
+            .insert([
+              {
+                user_id: ownerData.id,
+                title: "New Application Received",
+                message: `Someone applied to your petition "${petition.title}"`,
+                type: "application",
+                petition_id: Number(petition.id),
+                is_read: false,
+              },
+            ]);
+
+          if (notificationError) {
+            console.error("Error creating notification:", notificationError);
+            // Don't fail the application submission if notification fails
+          }
+        }
+      }
+
+      toast.success(
+        <>
+          <strong>Application submitted successfully!</strong>
+          <div>
+            Your application for &quot;{petition.title}&quot; has been sent to
+            the petition owner.
+          </div>
+        </>
+      );
+
+      // Reset form and close modal
+      setApplicationData({
+        message: "",
+        expectedSalary: "",
+        availability: "",
+        portfolio: "",
+        cv: null,
+      });
+
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -187,7 +352,11 @@ export function ApplicationModal({ open, onOpenChange, petition }: ApplicationMo
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="cv">Curriculum Vitae *</Label>
+            <Label htmlFor="cv">Curriculum Vitae (optional)</Label>
+            <p className="text-sm text-muted-foreground mb-2">
+              You can submit your application without a CV. Upload one to
+              strengthen your application.
+            </p>
             <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
               <input
                 type="file"
@@ -195,7 +364,6 @@ export function ApplicationModal({ open, onOpenChange, petition }: ApplicationMo
                 accept=".pdf,.doc,.docx"
                 onChange={handleFileUpload}
                 className="hidden"
-                required
               />
               <label htmlFor="cv" className="cursor-pointer">
                 <div className="flex flex-col items-center gap-2">
@@ -206,13 +374,27 @@ export function ApplicationModal({ open, onOpenChange, petition }: ApplicationMo
                       <p className="text-sm text-muted-foreground">
                         {(applicationData.cv.size / 1024 / 1024).toFixed(2)} MB
                       </p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setApplicationData((prev) => ({ ...prev, cv: null }));
+                        }}
+                        className="mt-2"
+                      >
+                        Remove CV
+                      </Button>
                     </>
                   ) : (
                     <>
                       <Upload className="h-8 w-8 text-muted-foreground" />
-                      <p className="font-medium">Upload Curriculum</p>
+                      <p className="font-medium">
+                        Upload Curriculum (Optional)
+                      </p>
                       <p className="text-sm text-muted-foreground">
-                        PDF, DOC or DOCX (max. 10MB)
+                        PDF, DOC or DOCX (max. 10MB) - or skip this step
                       </p>
                     </>
                   )}
@@ -226,11 +408,16 @@ export function ApplicationModal({ open, onOpenChange, petition }: ApplicationMo
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
+              disabled={isSubmitting}
             >
               Cancel
             </Button>
-            <Button type="submit" className="bg-primary hover:bg-primary/80">
-              Submit Application
+            <Button
+              type="submit"
+              className="bg-primary hover:bg-primary/80"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Submitting..." : "Submit Application"}
             </Button>
           </div>
         </form>
