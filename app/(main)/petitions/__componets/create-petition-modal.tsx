@@ -208,23 +208,30 @@ export function CreatePetitionModal({
       } else if (usersWithInterest && usersWithInterest.length > 0) {
         // Filter out the petition creator
         const filteredUsers = usersWithInterest.filter(
-          (userInterest: any) => userInterest.users?.uuid !== user.id
+          (userInterest: {
+            user_id: number;
+            users?: { uuid: string } | null;
+          }) => userInterest.users?.uuid !== user.id
         );
 
         console.log("Filtered users (excluding creator):", filteredUsers);
 
         if (filteredUsers.length > 0) {
           // Create notifications for users with matching interests (excluding creator)
-          const notifications = filteredUsers.map((userInterest: unknown) => ({
-            user_id: userInterest.user_id,
-            title: "New Petition in Your Interest Area",
-            message: `A new petition "${formData.title}" has been created in ${
-              formData.category?.name || "Unknown Category"
-            }`,
-            type: "job_match",
-            petition_id: petitionData.id,
-            is_read: false,
-          }));
+          const notifications = filteredUsers.map(
+            (userInterest: { user_id: number }) => ({
+              user_id: userInterest.user_id,
+              title: "New Petition in Your Interest Area",
+              message: `A new petition "${
+                formData.title
+              }" has been created in ${
+                formData.category?.name || "Unknown Category"
+              }`,
+              type: "job_match",
+              petition_id: petitionData.id,
+              is_read: false,
+            })
+          );
 
           console.log("Notifications to be created:", notifications);
 
