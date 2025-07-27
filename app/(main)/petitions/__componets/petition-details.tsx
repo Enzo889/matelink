@@ -1,14 +1,15 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { formatDistanceToNow } from "date-fns"
-import { enUS } from "date-fns/locale"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Separator } from "@/components/ui/separator"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useState, useEffect } from "react";
+import { formatDistanceToNow } from "date-fns";
+import { enUS } from "date-fns/locale";
+import { createClient } from "@/utils/supabase/client";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   MapPin,
   DollarSign,
@@ -21,12 +22,30 @@ import {
   Heart,
   Flag,
   ArrowLeft,
-} from "lucide-react"
-import { useRouter } from "next/navigation"
-import { ApplicationModal } from "./aplication-modal"
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ApplicationModal } from "./aplication-modal";
 
 interface PetitionDetailsProps {
-  petitionId: string
+  petitionId: string;
+}
+
+interface PetitionData {
+  id: number;
+  user_uuid: string | null;
+  title: string | null;
+  description: string | null;
+  category: number | null;
+  petition_type: string | null;
+  budget: string | null;
+  location: string | null;
+  requirements: string | null;
+  duration: string | null;
+  participants: string | null;
+  created_at: string | null;
+  categoryName?: string;
+  tags?: string[];
+  postedBy?: string;
 }
 
 // Mock data - in a real app this would come from an API
@@ -64,7 +83,8 @@ I'm very motivated to learn and willing to do homework and practice between clas
   postedBy: "María González",
   postedAt: "2025-07-23T10:30:00Z",
   applicationsCount: 8,
-  requirements: "Teacher with experience teaching beginners, patience and afternoon availability.",
+  requirements:
+    "Teacher with experience teaching beginners, patience and afternoon availability.",
   userProfile: {
     rating: 4.8,
     reviewsCount: 23,
@@ -113,40 +133,150 @@ I'm very motivated to learn and willing to do homework and practice between clas
       applicationsCount: 8,
     },
   ],
-}
+};
 
 export function PetitionDetails({ petitionId }: PetitionDetailsProps) {
-  const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false)
-  const [isLiked, setIsLiked] = useState(false)
-  const router = useRouter()
+  const [petition, setPetition] = useState<PetitionData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const router = useRouter();
+  const supabase = createClient();
 
-  const timeAgo = formatDistanceToNow(new Date(mockPetition.postedAt), {
-    addSuffix: true,
-    locale: enUS,
-  })
+  useEffect(() => {
+    const fetchPetition = async () => {
+      try {
+        // First, fetch the petition data
+        const { data: petitionData, error: petitionError } = await supabase
+          .from("petitions")
+          .select("*")
+          .eq("id", Number(petitionId))
+          .single();
+
+        if (petitionError) {
+          console.error("Error fetching petition:", petitionError);
+          setLoading(false);
+          return;
+        }
+
+        // Fetch category name separately
+        let categoryName = "Unknown";
+        if (petitionData.category) {
+          const { data: categoryData } = await supabase
+            .from("interests")
+            .select("name")
+            .eq("id", petitionData.category)
+            .single();
+
+          categoryName = categoryData?.name || "Unknown";
+        }
+
+        // Fetch petition tags
+        const { data: tagsData } = await supabase
+          .from("petition_tags")
+          .select("tag")
+          .eq("petition_id", Number(petitionId));
+
+        // Fetch user profile data
+        let postedBy = "Anonymous User";
+        if (petitionData.user_uuid) {
+          const { data: userData } = await supabase
+            .from("users")
+            .select("name, email")
+            .eq("uuid", petitionData.user_uuid)
+            .single();
+
+          postedBy = userData?.name || userData?.email || "Anonymous User";
+        }
+
+        const enrichedPetition: PetitionData = {
+          ...petitionData,
+          categoryName,
+          tags:
+            tagsData
+              ?.map((tag) => tag.tag)
+              .filter((tag): tag is string => tag !== null) || [],
+          postedBy,
+        };
+
+        setPetition(enrichedPetition);
+      } catch (error) {
+        console.error("Error fetching petition:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (petitionId) {
+      fetchPetition();
+    }
+  }, [petitionId, supabase]);
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="animate-pulse space-y-6">
+          <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+          <div className="h-32 bg-gray-200 rounded"></div>
+          <div className="h-64 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!petition) {
+    return (
+      <div className="max-w-4xl mx-auto p-6">
+        <Card>
+          <CardContent className="p-8 text-center">
+            <p className="text-muted-foreground">Petition not found</p>
+            <Button
+              variant="outline"
+              onClick={() => router.back()}
+              className="mt-4"
+            >
+              Go Back
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const timeAgo = formatDistanceToNow(
+    new Date(petition.created_at || Date.now()),
+    {
+      addSuffix: true,
+      locale: enUS,
+    }
+  );
 
   const getInitials = (name: string) => {
     return name
       .split(" ")
       .map((n) => n[0])
       .join("")
-      .toUpperCase()
-  }
+      .toUpperCase();
+  };
 
   const getPetitionTypeColor = (type: string) => {
     switch (type) {
+      case "Looking for Service":
       case "Busco Servicio":
-        return "bg-blue-600"
+        return "bg-blue-600";
+      case "Offering Service":
       case "Ofrezco Servicio":
-        return "bg-green-600"
+        return "bg-green-600";
+      case "Exchange":
       case "Intercambio":
-        return "bg-purple-600"
+        return "bg-purple-600";
+      case "Collaboration":
       case "Colaboración":
-        return "bg-orange-600"
+        return "bg-orange-600";
       default:
-        return "bg-gray-600"
+        return "bg-gray-600";
     }
-  }
+  };
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -168,13 +298,11 @@ export function PetitionDetails({ petitionId }: PetitionDetailsProps) {
                 <div className="flex items-center gap-3">
                   <Avatar className="h-12 w-12">
                     <AvatarFallback className="bg-amber-600 text-white">
-                      {getInitials(mockPetition.postedBy)}
+                      {getInitials(petition.postedBy || "Anonymous")}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-semibold text-lg">
-                      {mockPetition.postedBy}
-                    </p>
+                    <p className="font-semibold text-lg">{petition.postedBy}</p>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
@@ -210,34 +338,34 @@ export function PetitionDetails({ petitionId }: PetitionDetailsProps) {
               </div>
 
               <div className="flex gap-2 mb-4">
-                <Badge variant="secondary">{mockPetition.category}</Badge>
+                <Badge variant="secondary">{petition.categoryName}</Badge>
                 <Badge
                   className={`${getPetitionTypeColor(
-                    mockPetition.petitionType
+                    petition.petition_type || ""
                   )} text-white`}
                 >
-                  {mockPetition.petitionType}
+                  {petition.petition_type}
                 </Badge>
               </div>
 
-              <h1 className="text-2xl font-bold mb-4">{mockPetition.title}</h1>
+              <h1 className="text-2xl font-bold mb-4">{petition.title}</h1>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div className="flex items-center gap-2">
                   <DollarSign className="h-4 w-4 text-muted-foreground" />
-                  <span>{mockPetition.budget}</span>
+                  <span>{petition.budget || "Not specified"}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-muted-foreground" />
-                  <span>{mockPetition.location}</span>
+                  <span>{petition.location || "Not specified"}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-muted-foreground" />
-                  <span>{mockPetition.duration}</span>
+                  <span>{petition.duration || "Not specified"}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4 text-muted-foreground" />
-                  <span>{mockPetition.participants}</span>
+                  <span>{petition.participants || "Not specified"}</span>
                 </div>
               </div>
             </CardHeader>
@@ -250,7 +378,7 @@ export function PetitionDetails({ petitionId }: PetitionDetailsProps) {
             </CardHeader>
             <CardContent>
               <div className="prose prose-sm max-w-none dark:prose-invert">
-                {mockPetition.description
+                {(petition.description || "No description provided")
                   .split("\n")
                   .map((paragraph, index) => (
                     <p key={index} className="mb-4 leading-relaxed">
@@ -277,19 +405,25 @@ export function PetitionDetails({ petitionId }: PetitionDetailsProps) {
               <div>
                 <h4 className="font-medium mb-2">Tags:</h4>
                 <div className="flex flex-wrap gap-2">
-                  {mockPetition.tags.map((tag) => (
-                    <Badge key={tag} variant="outline">
-                      {tag}
-                    </Badge>
-                  ))}
+                  {petition.tags && petition.tags.length > 0 ? (
+                    petition.tags.map((tag) => (
+                      <Badge key={tag} variant="outline">
+                        {tag}
+                      </Badge>
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      No tags added
+                    </p>
+                  )}
                 </div>
               </div>
 
-              {mockPetition.requirements && (
+              {petition.requirements && (
                 <div>
                   <h4 className="font-medium mb-2">Requirements:</h4>
                   <p className="text-muted-foreground">
-                    {mockPetition.requirements}
+                    {petition.requirements}
                   </p>
                 </div>
               )}
@@ -371,16 +505,16 @@ export function PetitionDetails({ petitionId }: PetitionDetailsProps) {
             <CardContent className="p-4">
               <Button
                 onClick={() => setIsApplicationModalOpen(true)}
-                className="w-full bg-amber-600 hover:bg-amber-700 text-white mb-3"
+                className="w-full bg-primary hover:bg-primary/80 mb-3 cursor-pointer"
                 size="lg"
               >
-                {mockPetition.petitionType === "Busco Servicio"
+                {petition.petition_type === "Looking for Service"
                   ? "Offer Service"
                   : "I'm Interested"}
               </Button>
               <Button
                 variant="outline"
-                className="w-full bg-transparent"
+                className="w-full bg-transparent cursor-pointer"
                 onClick={() => router.push(`/message/chat`)}
               >
                 <MessageCircle className="h-4 w-4 mr-2" />
@@ -393,7 +527,7 @@ export function PetitionDetails({ petitionId }: PetitionDetailsProps) {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">
-                About {mockPetition.postedBy}
+                About {petition.postedBy}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -470,7 +604,20 @@ export function PetitionDetails({ petitionId }: PetitionDetailsProps) {
       <ApplicationModal
         open={isApplicationModalOpen}
         onOpenChange={setIsApplicationModalOpen}
-        petition={mockPetition}
+        petition={{
+          id: petition.id.toString(),
+          title: petition.title || "",
+          description: petition.description || "",
+          category: petition.categoryName || "",
+          petitionType: petition.petition_type || "",
+          budget: petition.budget || "",
+          location: petition.location || "",
+          tags: petition.tags || [],
+          duration: petition.duration || "",
+          participants: petition.participants || "",
+          postedBy: petition.postedBy || "",
+          requirements: petition.requirements || "",
+        }}
       />
     </div>
   );
