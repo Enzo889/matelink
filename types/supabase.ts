@@ -14,6 +14,122 @@ export type Database = {
   }
   public: {
     Tables: {
+      application_messages: {
+        Row: {
+          application_id: number | null
+          created_at: string | null
+          id: number
+          message: string
+          sender_id: number | null
+          sender_uuid: string | null
+        }
+        Insert: {
+          application_id?: number | null
+          created_at?: string | null
+          id?: number
+          message: string
+          sender_id?: number | null
+          sender_uuid?: string | null
+        }
+        Update: {
+          application_id?: number | null
+          created_at?: string | null
+          id?: number
+          message?: string
+          sender_id?: number | null
+          sender_uuid?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "application_messages_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "application_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "user_profile_wall"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "application_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      applications: {
+        Row: {
+          applicant_id: number | null
+          applicant_uuid: string | null
+          availability: string | null
+          created_at: string | null
+          cv_url: string | null
+          expected_salary: string | null
+          id: number
+          message: string
+          petition_id: number | null
+          portfolio: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          applicant_id?: number | null
+          applicant_uuid?: string | null
+          availability?: string | null
+          created_at?: string | null
+          cv_url?: string | null
+          expected_salary?: string | null
+          id?: number
+          message: string
+          petition_id?: number | null
+          portfolio?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          applicant_id?: number | null
+          applicant_uuid?: string | null
+          availability?: string | null
+          created_at?: string | null
+          cv_url?: string | null
+          expected_salary?: string | null
+          id?: number
+          message?: string
+          petition_id?: number | null
+          portfolio?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_applicant_id_fkey"
+            columns: ["applicant_id"]
+            isOneToOne: false
+            referencedRelation: "user_profile_wall"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "applications_applicant_id_fkey"
+            columns: ["applicant_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "applications_petition_id_fkey"
+            columns: ["petition_id"]
+            isOneToOne: false
+            referencedRelation: "petitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blocked_users: {
         Row: {
           blocked_at: string | null
@@ -781,7 +897,7 @@ export type Database = {
       petitions: {
         Row: {
           budget: string | null
-          category: string | null
+          category: number | null
           created_at: string | null
           description: string | null
           duration: string | null
@@ -795,7 +911,7 @@ export type Database = {
         }
         Insert: {
           budget?: string | null
-          category?: string | null
+          category?: number | null
           created_at?: string | null
           description?: string | null
           duration?: string | null
@@ -809,7 +925,7 @@ export type Database = {
         }
         Update: {
           budget?: string | null
-          category?: string | null
+          category?: number | null
           created_at?: string | null
           description?: string | null
           duration?: string | null
@@ -822,6 +938,13 @@ export type Database = {
           user_uuid?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_petitions_category"
+            columns: ["category"]
+            isOneToOne: false
+            referencedRelation: "interests"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "petitions_user_uuid_fkey"
             columns: ["user_uuid"]
@@ -1309,6 +1432,54 @@ export type Database = {
           },
           {
             foreignKeyName: "settings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      uploaded_files: {
+        Row: {
+          created_at: string | null
+          file_name: string
+          file_path: string
+          file_size: number | null
+          file_type: string | null
+          id: number
+          user_id: number | null
+          user_uuid: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          file_type?: string | null
+          id?: number
+          user_id?: number | null
+          user_uuid?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          file_type?: string | null
+          id?: number
+          user_id?: number | null
+          user_uuid?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uploaded_files_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profile_wall"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "uploaded_files_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
