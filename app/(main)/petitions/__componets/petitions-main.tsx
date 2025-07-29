@@ -235,7 +235,7 @@ export function PetitionsMain() {
   return (
     <div className="w-full mx-auto">
       <div className="border-b border-border p-4">
-        <h2 className="text-xl font-bold">My Jobs</h2>
+        <h2 className="text-xl font-bold">My Petitions</h2>
         <p className="text-muted-foreground">
           Manage your requests and applications
         </p>
@@ -243,7 +243,7 @@ export function PetitionsMain() {
 
       <Tabs defaultValue="posted" className="w-full">
         <TabsList className="grid min-w-xl  grid-cols-2 m-4  mx-auto">
-          <TabsTrigger value="posted">Posted Jobs</TabsTrigger>
+          <TabsTrigger value="posted">Posted Petitions</TabsTrigger>
           <TabsTrigger value="applied">My Applications</TabsTrigger>
         </TabsList>
 

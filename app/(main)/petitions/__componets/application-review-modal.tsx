@@ -315,7 +315,7 @@ export function ApplicationReviewModal({
       <DialogContent className="max-w-full max-h-[90vh] overflow-y-auto ">
         <DialogHeader>
           <DialogTitle className="text-2xl">
-            Postulaciones para: {job.title}
+            Applications for: {job.title}
           </DialogTitle>
         </DialogHeader>
 
@@ -323,7 +323,7 @@ export function ApplicationReviewModal({
           {/* Lista de postulaciones */}
           <div className="space-y-4">
             <h3 className="font-semibold text-lg">
-              Postulaciones ({job.applications.length})
+              Applications ({job.applications.length})
             </h3>
 
             {job.applications.map((application) => (
@@ -367,7 +367,7 @@ export function ApplicationReviewModal({
                       }
                     >
                       {application.status === "pending"
-                        ? "Pendiente"
+                        ? "Pending"
                         : application.status}
                     </Badge>
                   </div>
@@ -377,8 +377,8 @@ export function ApplicationReviewModal({
                     {application.message}
                   </p>
                   <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
-                    <span>Salario: {application.expectedSalary}</span>
-                    <span>Disponibilidad: {application.availability}</span>
+                    <span>Salary: {application.expectedSalary}</span>
+                    <span>Availability: {application.availability}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -398,7 +398,7 @@ export function ApplicationReviewModal({
                   <>
                     <div className="flex items-center justify-between">
                       <h3 className="font-semibold text-lg">
-                        Detalles de la Postulación
+                        Application Details
                       </h3>
                       <Badge
                         variant={
@@ -408,7 +408,7 @@ export function ApplicationReviewModal({
                         }
                       >
                         {application.status === "pending"
-                          ? "Pendiente"
+                          ? "Pending"
                           : application.status}
                       </Badge>
                     </div>
@@ -426,7 +426,7 @@ export function ApplicationReviewModal({
                               {application.applicantName}
                             </p>
                             <p className="text-sm text-muted-foreground">
-                              Postulado{" "}
+                              Applied
                               {formatDistanceToNow(
                                 new Date(application.appliedAt),
                                 {
@@ -441,7 +441,7 @@ export function ApplicationReviewModal({
                       <CardContent className="space-y-4">
                         <div>
                           <Label className="font-medium">
-                            Mensaje de postulación:
+                            Application Message
                           </Label>
                           <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
                             {application.message}
@@ -451,16 +451,14 @@ export function ApplicationReviewModal({
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <Label className="font-medium">
-                              Salario esperado:
+                              Expected Salary:
                             </Label>
                             <p className="text-sm text-muted-foreground">
                               {application.expectedSalary}
                             </p>
                           </div>
                           <div>
-                            <Label className="font-medium">
-                              Disponibilidad:
-                            </Label>
+                            <Label className="font-medium">Availability:</Label>
                             <p className="text-sm text-muted-foreground">
                               {application.availability}
                             </p>
@@ -507,17 +505,15 @@ export function ApplicationReviewModal({
 
                     {/* Responder al candidato */}
                     <Card>
-                      <CardHeader>
-                        <h4 className="font-medium">Responder al candidato</h4>
-                      </CardHeader>
+                      <CardHeader>Respond to candidate</CardHeader>
                       <CardContent className="space-y-4">
                         <div className="space-y-2">
-                          <Label htmlFor="response">Mensaje (opcional):</Label>
+                          <Label htmlFor="response">Message (opcional):</Label>
                           <Textarea
                             id="response"
                             value={responseMessage}
                             onChange={(e) => setResponseMessage(e.target.value)}
-                            placeholder="Escribe un mensaje para el candidato..."
+                            placeholder="Write a message for the candidate..."
                             rows={3}
                           />
                         </div>
@@ -536,7 +532,7 @@ export function ApplicationReviewModal({
                             }
                           >
                             <CheckCircle className="h-4 w-4 mr-2" />
-                            {isProcessing ? "Processing..." : "Aceptar"}
+                            Accept
                           </Button>
                           <Button
                             onClick={() =>
@@ -552,7 +548,7 @@ export function ApplicationReviewModal({
                             }
                           >
                             <X className="h-4 w-4 mr-2" />
-                            {isProcessing ? "Processing..." : "Rechazar"}
+                            {isProcessing ? "Processing..." : "Reject"}
                           </Button>
                         </div>
 
@@ -569,7 +565,7 @@ export function ApplicationReviewModal({
                             disabled={isProcessing}
                           >
                             <MessageCircle className="h-4 w-4 mr-2" />
-                            {isProcessing ? "Sending..." : "Enviar Mensaje"}
+                            {isProcessing ? "Sending..." : "Send Message"}
                           </Button>
                         )}
                       </CardContent>
@@ -579,7 +575,7 @@ export function ApplicationReviewModal({
               })()
             ) : (
               <div className="flex items-center justify-center h-64 text-muted-foreground">
-                <p>Selecciona una postulación para ver los detalles</p>
+                Select an application to view details
               </div>
             )}
           </div>
